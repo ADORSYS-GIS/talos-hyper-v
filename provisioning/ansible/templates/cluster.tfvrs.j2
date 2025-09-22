@@ -1,0 +1,36 @@
+# Hyper-V hosts
+hyperv_hosts = {
+{% for host, creds in hyperv_hosts.items() %}
+  "{{ host }}" = {
+    host     = "{{ creds.host }}"
+    user     = "{{ creds.user }}"
+    password = "{{ creds.password }}"
+  }
+{% endfor %}
+}
+
+# VMs per host (auto-generated IPs)
+vms_by_host = {
+{% set ip_start = ip_range_start.split('.') %}
+{% set base = ip_start[:-1] | join('.') %}
+{% set last_octet = ip_start[-1]|int %}
+{% set current_ip = last_octet %}
+{% for i in range(cp_count) %}
+  "{{ hyperv_hosts.keys() | list[i % hyperv_hosts | length] }}" = [
+    { name = "{{ vm_prefix }}-cp{{ i+1 }}", role = "controlplane", ip = "{{ base }}.{{ current_ip }}" }
+  ]
+  {% set current_ip = current_ip + 1 %}
+{% endfor %}
+{% for i in range(wk_count) %}
+  "{{ hyperv_hosts.keys() | list[i % hyperv_hosts | length] }}" = [
+    { name = "{{ vm_prefix }}-wk{{ i+1 }}", role = "worker", ip = "{{ base }}.{{ current_ip }}" }
+  ]
+  {% set current_ip = current_ip + 1 %}
+{% endfor %}
+}
+
+api_vip   = "{{ api_vip }}"
+vm_memory = 4096
+vm_cpu    = 2
+iso_path  = "{{ iso_path }}"
+switch    = "{{ switch }}"

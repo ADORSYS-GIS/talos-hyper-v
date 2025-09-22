@@ -1,0 +1,19 @@
+---
+- name: Ensure Talos ISO exists on Hyper-V hosts
+  hosts: hyperv_hosts
+  gather_facts: false
+  vars:
+    iso_url: "{{ lookup('env', 'TALOS_ISO_URL') }}"
+    iso_path: "C:/isos/talos-metal-amd64.iso"
+  tasks:
+    - name: Ensure ISO directory exists
+      win_file:
+        path: "{{ iso_path | win_splitdrive | last | dirname | regex_replace('\\\\','/') }}"
+        state: directory
+
+    - name: Download Talos ISO if missing
+      win_get_url:
+        url: "{{ iso_url }}"
+        dest: "{{ iso_path }}"
+      args:
+        creates: "{{ iso_path }}"

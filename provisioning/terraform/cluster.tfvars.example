@@ -1,0 +1,33 @@
+# List of Hyper-V hosts with provider connection details
+hyperv_hosts = {
+  "hyperv1" = {
+    host     = "192.168.1.11"
+    user     = "Administrator"
+    password = "CHANGEME123!"
+  }
+  "hyperv2" = {
+    host     = "192.168.1.12"
+    user     = "Administrator"
+    password = "CHANGEME123!"
+  }
+}
+
+# VM definitions per host
+vms_by_host = {
+  "hyperv1" = [
+    { name = "cp1", role = "controlplane", ip = "192.168.1.101" },
+    { name = "wk1", role = "worker",       ip = "192.168.1.201" }
+  ]
+  "hyperv2" = [
+    { name = "cp2", role = "controlplane", ip = "192.168.1.102" },
+    { name = "cp3", role = "controlplane", ip = "192.168.1.103" },
+    { name = "wk2", role = "worker",       ip = "192.168.1.202" }
+  ]
+}
+
+# Shared cluster settings
+api_vip   = "192.168.1.100"
+vm_memory = "4096"   # in MB
+vm_cpu    = 2
+iso_path  = "C:/isos/talos-metal-amd64.iso"
+switch    = "ExternalSwitch"
