@@ -98,7 +98,12 @@ variable "vm_cpu" {
 
 variable "switch" {
   type = string
-  default = "ExternalSwitch"
+  default = "Default Switch"
+}
+
+variable "net_adapter_name" {
+  type = string
+  description = "Name of the physical network adapter to bind the external switch to."
 }
 
 variable "vhd_name" {
@@ -110,6 +115,12 @@ variable "vhd_size_gb" {
   type = number
   default = 40
 }
+
+variable "talos_version" {
+  type    = string
+  default = "v1.5.0"
+}
+
 variable "iso_path" {
   type = string
 }

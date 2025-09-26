@@ -17,13 +17,14 @@ module "host1_vms" {
 
 # Combine outputs
 locals {
-  all_vm_infos = try(module.host1_vms.vms, [])
+  all_vm_infos = try(module.host1_vms.vms, []) # Concatenate VM info from all hosts
 }
 
 resource "hyperv_network_switch" "cluster_switch" {
-  provider    = hyperv.host1
-  name        = var.switch
-  switch_type = "External"
+  provider          = hyperv.host1
+  name              = var.switch
+  switch_type       = "External"
+  net_adapter_names = [var.net_adapter_name]
 }
 
 resource "hyperv_vhd" "webserver" {

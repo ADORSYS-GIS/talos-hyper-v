@@ -1,19 +1,14 @@
 all:
-  children:
-    controller:
-      hosts:
-        controller1:
-          ansible_host: "{{ controller_host }}"
-          ansible_user: "{{ controller_user }}"
-          ansible_ssh_private_key_file: "{{ controller_ssh_key }}"
-          tf_dir: "{{ tf_dir }}"
-    hyperv_hosts:
-      hosts:
-        hyperv1:
-          ansible_host: "{{ hyperv1_host }}"
-          ansible_user: "{{ hyperv1_user }}"
-          ansible_password: "{{ hyperv1_pass }}"
-        hyperv2:
-          ansible_host: "{{ hyperv2_host }}"
-          ansible_user: "{{ hyperv2_user }}"
-          ansible_password: "{{ hyperv2_pass }}"
+  hosts:
+    hyperv1:
+      ansible_host: "{{ hyperv1_host }}"
+      ansible_user: "{{ hyperv_user }}"
+      ansible_password: "{{ hyperv_pass }}"
+      ansible_connection: winrm
+      ansible_winrm_server_cert_validation: ignore
+    hyperv2:
+      ansible_host: "{{ hyperv2_host }}"
+      ansible_user: "{{ hyperv_user }}"
+      ansible_password: "{{ hyperv_pass }}"
+      ansible_connection: winrm
+      ansible_winrm_server_cert_validation: ignore

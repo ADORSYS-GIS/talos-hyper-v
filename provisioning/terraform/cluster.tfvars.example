@@ -1,33 +1,28 @@
-# List of Hyper-V hosts with provider connection details
-hyperv_hosts = {
-  "hyperv1" = {
-    host     = "192.168.1.11"
-    user     = "Administrator"
-    password = "CHANGEME123!"
-  }
-  "hyperv2" = {
-    host     = "192.168.1.12"
-    user     = "Administrator"
-    password = "CHANGEME123!"
-  }
-}
+# Hyper-V host connection details
+hyperv_host1 = "192.168.10.2"
+hyperv_user  = "Administrator"
+hyperv_password = "hyperv237!"
+hyperv_port = 5985
+hyperv_https = false
+hyperv_insecure = true
+hyperv_use_ntlm = false
+
+# Talos version
+talos_version = "v1.5.0"
+
+# Path to the Talos ISO image
+iso_path = "C:/path/to/your/talos-metal-amd64.iso" # Update with the actual path to your Talos ISO
 
 # VM definitions per host
 vms_by_host = {
-  "hyperv1" = [
-    { name = "cp1", role = "controlplane", ip = "192.168.1.101" },
-    { name = "wk1", role = "worker",       ip = "192.168.1.201" }
-  ]
-  "hyperv2" = [
-    { name = "cp2", role = "controlplane", ip = "192.168.1.102" },
-    { name = "cp3", role = "controlplane", ip = "192.168.1.103" },
-    { name = "wk2", role = "worker",       ip = "192.168.1.202" }
+  "host1" = [
+    { name = "talos-cp1", role = "controlplane,master", ip = "192.168.10.101" },
+    { name = "talos-wk1", role = "worker", ip = "192.168.10.201" },
+    { name = "talos-wk2", role = "worker", ip = "192.168.10.202" }
   ]
 }
 
 # Shared cluster settings
-api_vip   = "192.168.1.100"
-vm_memory = "4096"   # in MB
-vm_cpu    = 2
-iso_path  = "C:/isos/talos-metal-amd64.iso"
-switch    = "ExternalSwitch"
+api_vip = "192.168.10.100"
+switch  = "Default Switch" # Update with your Hyper-V virtual switch name
+net_adapter_name = "Ethernet" # Update with your physical network adapter name

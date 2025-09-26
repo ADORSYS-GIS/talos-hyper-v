@@ -8,6 +8,12 @@ locals {
   ]
 }
 
+resource "hyperv_vhd" "disk" {
+  for_each = { for vm in var.vms : vm.name => vm }
+  path     = "C:/Hyper-V/${each.key}.vhdx"
+  size     = lookup(each.value, "disk_gb", 40) * 1024 * 1024 * 1024
+}
+
 resource "hyperv_machine_instance" "vm" {
   for_each = { for idx, vm in var.vms : vm.name => merge(vm, { mac = local.macs[idx] }) }
 
@@ -17,6 +23,8 @@ resource "hyperv_machine_instance" "vm" {
   processor_count    = lookup(each.value, "cpus", 2)
   static_memory      = true # Assuming static memory for simplicity, can be made variable
 
+  depends_on = [hyperv_vhd.disk]
+
   network_adaptors {
     name        = "${each.key}-nic" # A unique name for the network adapter
     switch_name = var.cluster_switch
@@ -24,8 +32,8 @@ resource "hyperv_machine_instance" "vm" {
   }
 
   dvd_drives {
-    controller_number   = 1
-    controller_location = 0
+    controller_number   = 0
+    controller_location = 1
     path                = var.iso_path
   }
 
@@ -38,8 +46,8 @@ resource "hyperv_machine_instance" "vm" {
   vm_firmware {
     boot_order {
       boot_type = "DvdDrive"
-      controller_number = 1
-      controller_location = 0
+      controller_number = 0
+      controller_location = 1
     }
     boot_order {
       boot_type = "HardDiskDrive"

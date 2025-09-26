@@ -1,0 +1,9 @@
+---
+- name: Configure Talos cluster
+  hosts: all
+  gather_facts: false
+  vars:
+    tf_dir: "provisioning/terraform"
+    api_vip: "192.168.10.100"
+  roles:
+    - talos_config

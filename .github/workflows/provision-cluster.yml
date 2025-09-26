@@ -1,0 +1,58 @@
+name: Provision Talos Cluster on Hyper-V
+
+on:
+  workflow_dispatch:
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    env:
+      TALOS_VERSION: ${{ secrets.TALOS_VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download Talos ISO
+        run: |
+          ISO_URL="https://github.com/siderolabs/talos/releases/download/${{ env.TALOS_VERSION }}/metal-amd64.iso"
+          until wget -c -O talos-metal-amd64.iso "$ISO_URL"; do
+            echo "Download failed, retrying..."
+            sleep 1
+          done
+
+      - name: Copy ISO to Hyper-V host
+        run: |
+          scp -o StrictHostKeyChecking=no talos-metal-amd64.iso ${{ secrets.HYPERV_USER }}@${{ secrets.HYPERV_HOST }}:/C:/Users/Public/talos-metal-amd64.iso
+
+      - name: Copy tfvars
+        run: cp provisioning/terraform/cluster.tfvars.example provisioning/terraform/cluster.tfvars
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.0
+
+      - name: Terraform Init
+        run: terraform -chdir=provisioning/terraform init
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_hyperv_host1: ${{ secrets.HYPERV_HOST }}
+          TF_VAR_hyperv_user: ${{ secrets.HYPERV_USER }}
+          TF_VAR_hyperv_password: ${{ secrets.HYPERV_PASS }}
+          TF_VAR_iso_path: "C:/Users/Public/talos-metal-amd64.iso"
+          TF_VAR_talos_version: ${{ env.TALOS_VERSION }}
+        run: terraform -chdir=provisioning/terraform apply -var-file=cluster.tfvars -auto-approve
+
+      - name: Run Ansible Playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: provisioning/ansible/playbooks/main.yml
+          directory: ./
+          requirements: "ansible-galaxy collection install -r requirements.yml"
+          inventory: |
+            [hyperv]
+            ${{ secrets.HYPERV_HOST }} ansible_user=${{ secrets.HYPERV_USER }}
+          options: |
+            --extra-vars "api_vip=192.168.10.100"
+            --ssh-common-args="-o StrictHostKeyChecking=no"
