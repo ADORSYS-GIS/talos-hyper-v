@@ -1,38 +1,50 @@
 locals {
   # deterministic MAC generation fallback: stable per VM name
   macs = [
-    for vm in var.vms : lookup(vm, "mac", format("00:15:5d:%02x:%02x:%02x",
-      tonumber(substr(md5(vm.name),0,2),16),
-      tonumber(substr(md5(vm.name),2,2),16),
-      tonumber(substr(md5(vm.name),4,2),16)))
+    for vm in var.vms : lookup(vm, "mac", format("00:15:5d:%s:%s:%s",
+      substr(md5(vm.name), 0, 2),
+      substr(md5(vm.name), 2, 2),
+      substr(md5(vm.name), 4, 2)))
   ]
 }
 
-resource "hyperv_virtual_machine" "vm" {
+resource "hyperv_machine_instance" "vm" {
   for_each = { for idx, vm in var.vms : vm.name => merge(vm, { mac = local.macs[idx] }) }
 
-  name           = each.key
-  generation     = 2
-  memory_startup = lookup(each.value, "memory", 4096)
-  cpu_count      = lookup(each.value, "cpus", 2)
+  name               = each.key
+  generation         = 2
+  memory_startup_bytes = lookup(each.value, "memory", 4096) * 1024 * 1024 # Convert MB to Bytes
+  processor_count    = lookup(each.value, "cpus", 2)
+  static_memory      = true # Assuming static memory for simplicity, can be made variable
 
-  network_adapter {
-    switch_name = var.mgmt_switch
-    mac_address = each.value.mac
+  network_adaptors {
+    name        = "${each.key}-nic" # A unique name for the network adapter
+    switch_name = var.cluster_switch
+    static_mac_address = each.value.mac
   }
 
-  dvd_drive {
-    iso_path = var.iso_path
+  dvd_drives {
+    controller_number   = 1
+    controller_location = 0
+    path                = var.iso_path
   }
 
-  hard_disk {
-    path = "C:/Hyper-V/${each.key}.vhdx"
-    size = lookup(each.value, "disk_gb", 40)
+  hard_disk_drives {
+    controller_number   = 0
+    controller_location = 0
+    path                = "C:/Hyper-V/${each.key}.vhdx"
   }
 
-  boot_order {
-    boot_device = "DVD"
+  vm_firmware {
+    boot_order {
+      boot_type = "DvdDrive"
+      controller_number = 1
+      controller_location = 0
+    }
+    boot_order {
+      boot_type = "HardDiskDrive"
+      controller_number = 0
+      controller_location = 0
+    }
   }
-
-  # Provider may not populate ip_address; we treat ip from inputs as authoritative.
 }

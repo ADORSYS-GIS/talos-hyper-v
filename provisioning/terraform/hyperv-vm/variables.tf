@@ -14,6 +14,6 @@ variable "iso_path" {
   type = string
 }
 
-variable "mgmt_switch" {
+variable "cluster_switch" {
   type = string
 }
