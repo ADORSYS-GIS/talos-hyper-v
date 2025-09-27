@@ -44,6 +44,7 @@ resource "hyperv_machine_instance" "vm" {
   }
 
   vm_firmware {
+    enable_secure_boot = "Off"
     boot_order {
       boot_type = "DvdDrive"
       controller_number = 0

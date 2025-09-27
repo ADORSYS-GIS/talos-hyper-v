@@ -25,6 +25,7 @@ resource "hyperv_network_switch" "cluster_switch" {
   name              = var.switch
   switch_type       = "External"
   net_adapter_names = [var.net_adapter_name]
+  enable_iov        = true
 }
 
 resource "hyperv_vhd" "webserver" {
