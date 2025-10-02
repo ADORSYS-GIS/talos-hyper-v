@@ -13,7 +13,7 @@ module "validate_host" {
 }
 
 module "vms" {
-  source   = "./hyperv-vm"
+  source   = "./modules/hyperv-vm"
   for_each = { for k, v in var.vms_by_host : k => v if length(v) > 0 }
 
   providers = {
@@ -23,6 +23,8 @@ module "vms" {
   vms            = each.value
   iso_path       = var.iso_path
   cluster_switch = var.switch
+
+  depends_on = [module.validate_host]
 }
 
 # Combine outputs
