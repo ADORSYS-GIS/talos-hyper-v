@@ -1,11 +1,21 @@
 # Hyper-V host connection details
-hyperv_host1 = "192.168.10.2"
-hyperv_user  = "Administrator"
-hyperv_password = "hyperv237!"
-hyperv_port = 5985
-hyperv_https = false
-hyperv_insecure = true
-hyperv_use_ntlm = false
+hyperv_hosts = {
+  "host1" = {
+    host     = "192.168.10.2"
+    user     = "Administrator"
+    password = "hyperv237!"
+    port     = 5985
+    https    = false
+    insecure = true
+    use_ntlm = false
+  }
+  # You can add more hosts here, for example:
+  # "host2" = {
+  #   host     = "192.168.10.3"
+  #   user     = "Administrator"
+  #   password = "anotherpassword"
+  # }
+}
 
 # Talos version
 talos_version = "v1.5.0"

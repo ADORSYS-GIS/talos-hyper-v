@@ -1,67 +1,21 @@
-variable "hyperv_user" {
-  type = string
-  default = "Administrator"
-}
-
-variable "hyperv_password" {
-  type = string
-  default = "P@ssw0rd"
-  sensitive = true
-}
-
-variable "hyperv_host1" {
-  type = string
-  default = "127.0.0.1"
-}
-
-variable "hyperv_port" {
-  type = number
-  default = 5986
-}
-
-variable "hyperv_https" {
-  type = bool
-  default = false
-}
-
-variable "hyperv_insecure" {
-  type = bool
-  default = true
-}
-
-variable "hyperv_use_ntlm" {
-  type = bool
-  default = true
-}
-
-variable "hyperv_tls_server_name" {
-  type = string
-  default = ""
-}
-
-variable "hyperv_cacert_path" {
-  type = string
-  default = ""
-}
-
-variable "hyperv_cert_path" {
-  type = string
-  default = ""
-}
-
-variable "hyperv_key_path" {
-  type = string
-  default = ""
-}
-
-variable "hyperv_script_path" {
-  type = string
-  default = "C:/Temp/terraform_%RAND%.cmd"
-}
-
-variable "hyperv_timeout" {
-  type = string
-  default = "30s"
+variable "hyperv_hosts" {
+  type = map(object({
+    host            = string
+    port            = optional(number, 5985)
+    https           = optional(bool, false)
+    insecure        = optional(bool, true)
+    use_ntlm        = optional(bool, true)
+    user            = string
+    password        = string
+    tls_server_name = optional(string, "")
+    cacert_path     = optional(string, "")
+    cert_path       = optional(string, "")
+    key_path        = optional(string, "")
+    script_path     = optional(string, "C:/Temp/terraform_%RAND%.cmd")
+    timeout         = optional(string, "30s")
+  }))
+  description = "A map of Hyper-V hosts to connect to."
+  sensitive   = true
 }
 
 variable "vms_by_host" {
@@ -75,11 +29,6 @@ variable "vms_by_host" {
     disk_gb = optional(number, 40)
     host_key = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
   })))
-}
-
-variable "mgmt_switch_name" {
-  type = string
-  default = "MgmtSwitch"
 }
 
 variable "api_vip" {
@@ -101,11 +50,6 @@ variable "switch" {
   default = "Default Switch"
 }
 
-variable "net_adapter_name" {
-  type = string
-  description = "Name of the physical network adapter to bind the external switch to."
-}
-
 variable "vhd_name" {
   type = string
   default = "webserver.vhdx"
@@ -118,7 +62,7 @@ variable "vhd_size_gb" {
 
 variable "talos_version" {
   type    = string
-  default = "v1.5.0"
+  default = "v1.11.2"
 }
 
 variable "iso_path" {

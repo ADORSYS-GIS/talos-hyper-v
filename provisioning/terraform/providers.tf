@@ -7,32 +7,17 @@ terraform {
   }
 }
 
-# Provider for Host1
 provider "hyperv" {
-  alias           = "host1"
-  user            = var.hyperv_user
-  password        = var.hyperv_password
-  host            = var.hyperv_host1
-  port            = var.hyperv_port
-  https           = var.hyperv_https
-  insecure        = var.hyperv_insecure
-  use_ntlm        = var.hyperv_use_ntlm
-  tls_server_name = var.hyperv_tls_server_name
-  script_path     = var.hyperv_script_path
-  timeout         = var.hyperv_timeout
+  for_each        = var.hyperv_hosts
+  alias           = each.key
+  user            = each.value.user
+  password        = each.value.password
+  host            = each.value.host
+  port            = each.value.port
+  https           = each.value.https
+  insecure        = each.value.insecure
+  use_ntlm        = each.value.use_ntlm
+  tls_server_name = each.value.tls_server_name
+  script_path     = each.value.script_path
+  timeout         = each.value.timeout
 }
-
-# Provider for Host2
-# provider "hyperv" {
-#   alias           = "host2"
-#   user            = var.hyperv_user
-#   password        = var.hyperv_password
-#   host            = var.hyperv_host2
-#   port            = var.hyperv_port
-#   https           = var.hyperv_https
-#   insecure        = var.hyperv_insecure
-#   use_ntlm        = var.hyperv_use_ntlm
-#   tls_server_name = var.hyperv_tls_server_name
-#   script_path     = var.hyperv_script_path
-#   timeout         = var.hyperv_timeout
-# }
