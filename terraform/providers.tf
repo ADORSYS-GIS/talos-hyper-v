@@ -4,20 +4,19 @@ terraform {
       source  = "taliesins/hyperv"
       version = ">= 0.1.3"
     }
+    powershell = {
+      source  = "hashicorp/powershell"
+      version = ">= 1.0"
+    }
   }
 }
 
 provider "hyperv" {
-  for_each        = var.hyperv_hosts
-  alias           = each.key
-  user            = each.value.user
-  password        = each.value.password
-  host            = each.value.host
-  port            = each.value.port
-  https           = each.value.https
-  insecure        = each.value.insecure
-  use_ntlm        = each.value.use_ntlm
-  tls_server_name = each.value.tls_server_name
-  script_path     = each.value.script_path
-  timeout         = each.value.timeout
+  user     = var.hyperv_hosts["host1"].user
+  password = var.hyperv_hosts["host1"].password
+  host     = var.hyperv_hosts["host1"].host
+  port     = var.hyperv_hosts["host1"].port
+  https    = var.hyperv_hosts["host1"].https
+  insecure = var.hyperv_hosts["host1"].insecure
+  use_ntlm = var.hyperv_hosts["host1"].use_ntlm
 }

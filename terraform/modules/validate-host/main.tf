@@ -8,7 +8,7 @@ terraform {
 }
 
 data "powershell_script" "validate_winrm" {
-  script = file("${path.module}/../../scripts/check_wirm.ps1")
+  script = file("${path.module}/../../scripts/check-winrm.ps1")
 
   vars = {
     Host            = var.host
@@ -20,9 +20,4 @@ data "powershell_script" "validate_winrm" {
     Production      = var.production
     CertThumbprint  = var.cert_thumbprint
   }
-}
-
-output "validation_output" {
-  value       = data.powershell_script.validate_winrm.stdout
-  description = "Output from the WinRM validation script."
 }

@@ -26,7 +26,6 @@ resource "hyperv_machine_instance" "vm" {
   depends_on = [hyperv_vhd.disk]
 
   network_adaptors {
-    name        = "${each.key}-nic" # A unique name for the network adapter
     switch_name = var.cluster_switch
     static_mac_address = each.value.mac
   }
