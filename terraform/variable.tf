@@ -7,10 +7,7 @@ variable "hyperv_host" {
     use_ntlm        = optional(bool, true)
     user            = string
     password        = string
-    tls_server_name = optional(string, "")
-    cacert_path     = optional(string, "")
-    cert_path       = optional(string, "")
-    key_path        = optional(string, "")
+    cert_thumbprint = optional(string, "")
   })
   description = "A map of Hyper-V hosts to connect to."
   sensitive   = true
@@ -68,7 +65,7 @@ variable "iso_path" {
 }
 
 variable "production" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If true, enforce production checks (HTTPS required, cert thumbprint required)"
 }

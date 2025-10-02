@@ -1,5 +1,5 @@
-variable "vms" {
-  type = list(object({
+variable "vm" {
+  type = object({
     name    = string
     role    = string
     ip      = string
@@ -7,7 +7,7 @@ variable "vms" {
     memory  = optional(number, 4096)
     cpus    = optional(number, 2)
     disk_gb = optional(number, 40)
-  }))
+  })
 }
 
 variable "iso_path" {

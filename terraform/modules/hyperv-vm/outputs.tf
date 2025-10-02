@@ -1,3 +1,8 @@
-output "vms" {
-  value = [for vm in var.vms : { name = vm.name, ip = vm.ip, role = vm.role, mac = lookup(vm, "mac", "") }]
+output "vm" {
+  value = {
+    name = var.vm.name
+    ip   = var.vm.ip
+    role = var.vm.role
+    mac  = local.mac
+  }
 }

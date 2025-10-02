@@ -8,18 +8,18 @@ module "validate_host" {
   user            = var.hyperv_host.user
   password        = var.hyperv_host.password
   use_ntlm        = var.hyperv_host.use_ntlm
-  cert_thumbprint = each.value.cert_thumbprint
+  cert_thumbprint = var.hyperv_host.cert_thumbprint
 }
 
 module "vms" {
   source   = "./modules/hyperv-vm"
-  for_each = { for k, v in var.var.host_vms : k => v if length(v) > 0 }
+  for_each = { for vm in var.host_vms : vm.name => vm }
 
   providers = {
     hyperv = hyperv
   }
 
-  vms            = each.value
+  vm             = each.value
   iso_path       = var.iso_path
   cluster_switch = var.switch
 
@@ -28,7 +28,5 @@ module "vms" {
 
 # Combine outputs
 locals {
-  all_vm_infos = flatten([
-    for vms_out in module.vms : vms_out.vms
-  ])
+  all_vm_infos = [for vm in module.vms : vm.vm]
 }

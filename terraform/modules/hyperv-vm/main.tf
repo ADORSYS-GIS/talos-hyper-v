@@ -1,33 +1,30 @@
 locals {
   # deterministic MAC generation fallback: stable per VM name
-  macs = [
-    for vm in var.vms : lookup(vm, "mac", format("00:15:5d:%s:%s:%s",
-      substr(md5(vm.name), 0, 2),
-      substr(md5(vm.name), 2, 2),
-      substr(md5(vm.name), 4, 2)))
-  ]
+  mac = coalesce(var.vm.mac, format("00:15:5d:%s:%s:%s",
+    substr(md5(var.vm.name), 0, 2),
+    substr(md5(var.vm.name), 2, 2),
+    substr(md5(var.vm.name), 4, 2)
+  ))
 }
 
 resource "hyperv_vhd" "disk" {
-  for_each = { for vm in var.vms : vm.name => vm }
-  path     = "C:/Hyper-V/${each.key}.vhdx"
-  size     = lookup(each.value, "disk_gb", 40) * 1024 * 1024 * 1024
+  path = "C:/Hyper-V/${var.vm.name}.vhdx"
+  size = var.vm.disk_gb * 1024 * 1024 * 1024
 }
 
 resource "hyperv_machine_instance" "vm" {
-  for_each = { for idx, vm in var.vms : vm.name => merge(vm, { mac = local.macs[idx] }) }
-
-  name               = each.key
-  generation         = 2
-  memory_startup_bytes = lookup(each.value, "memory", 4096) * 1024 * 1024 # Convert MB to Bytes
-  processor_count    = lookup(each.value, "cpus", 2)
-  static_memory      = true # Assuming static memory for simplicity, can be made variable
+  name                 = var.vm.name
+  generation           = 2
+  memory_startup_bytes = var.vm.memory * 1024 * 1024 # Convert MB to Bytes
+  processor_count      = var.vm.cpus
+  static_memory        = true # Assuming static memory for simplicity, can be made variable
 
   depends_on = [hyperv_vhd.disk]
 
   network_adaptors {
-    switch_name = var.cluster_switch
-    static_mac_address = each.value.mac
+    name               = "${var.vm.name}-nic"
+    switch_name        = var.cluster_switch
+    static_mac_address = local.mac
   }
 
   dvd_drives {
@@ -39,19 +36,19 @@ resource "hyperv_machine_instance" "vm" {
   hard_disk_drives {
     controller_number   = 0
     controller_location = 0
-    path                = "C:/Hyper-V/${each.key}.vhdx"
+    path                = "C:/Hyper-V/${var.vm.name}.vhdx"
   }
 
   vm_firmware {
     enable_secure_boot = "Off"
     boot_order {
-      boot_type = "DvdDrive"
-      controller_number = 0
+      boot_type           = "DvdDrive"
+      controller_number   = 0
       controller_location = 1
     }
     boot_order {
-      boot_type = "HardDiskDrive"
-      controller_number = 0
+      boot_type           = "HardDiskDrive"
+      controller_number   = 0
       controller_location = 0
     }
   }
