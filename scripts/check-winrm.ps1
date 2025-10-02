@@ -2,7 +2,7 @@
 .SYNOPSIS
   Validate WinRM connectivity, firewall port reachability and auth type.
 
-.PARAMETER Host
+.PARAMETER TargetHost
 .PARAMETER Port
 .PARAMETER Https
 .PARAMETER UseNtlm
@@ -13,13 +13,13 @@
 #>
 
 param(
-  [Parameter(Mandatory=$true)][string]$Host,
+  [Parameter(Mandatory=$true)][string]$TargetHost,
   [Parameter(Mandatory=$true)][int]$Port,
-  [Parameter(Mandatory=$true)][bool]$Https,
-  [Parameter(Mandatory=$true)][bool]$UseNtlm,
+  [switch]$Https,
+  [switch]$UseNtlm,
   [Parameter(Mandatory=$true)][string]$User,
-  [Parameter(Mandatory=$true)][securestring]$Password,
-  [Parameter(Mandatory=$true)][bool]$Production,
+  [Parameter(Mandatory=$true)][string]$Password,
+  [switch]$Production,
   [Parameter(Mandatory=$false)][string]$CertThumbprint = ""
 )
 
@@ -28,43 +28,47 @@ function Write-ErrAndExit($msg, $code=1) {
   exit $code
 }
 
-Write-Host "WinRM validation starting for ${Host}:$Port (HTTPS=$Https, NTLM=$UseNtlm, Production=$Production)"
+Write-Host "WinRM validation starting for ${TargetHost}:$Port (HTTPS=$Https, NTLM=$UseNtlm, Production=$Production)"
 
 # 1) Check TCP connectivity from local runner
-Write-Host "-> Checking TCP connectivity to ${Host}:$Port ..."
-$tcpCheck = Test-NetConnection -ComputerName $Host -Port $Port -WarningAction SilentlyContinue
-if (-not $tcpCheck.TcpTestSucceeded) {
-  Write-ErrAndExit "TCP connectivity check FAILED to ${Host}:$Port. Is firewall blocking the port or host unreachable?"
-}
-Write-Host "   TCP OK."
-
-# 2) Test-WSMan (this verifies the WinRM service responds)
+Write-Host "-> Checking TCP connectivity to ${TargetHost}:$Port ..."
+$tcpClient = New-Object System.Net.Sockets.TcpClient
 try {
-  $wsmanUrl = "http://$Host:5985/wsman"
-  if ($Https) { $wsmanUrl = "https://$Host:5986/wsman" }
+    $connectionResult = $tcpClient.BeginConnect($TargetHost, $Port, $null, $null)
+    $success = $connectionResult.AsyncWaitHandle.WaitOne(5000) # 5 seconds timeout
 
-  Write-Host "-> Testing WSMan endpoint: $wsmanUrl"
-  # Use Test-WSMan to get basic response headers; it may error if auth fails
-  Test-WSMan -ComputerName $Host -Port $Port -UseSSL:$Https -ErrorAction Stop | Out-Null
-  Write-Host "   WSMan endpoint reachable."
+    if (-not $success) {
+        throw "Connection timed out."
+    }
+    
+    $tcpClient.EndConnect($connectionResult)
+    Write-Host "   TCP OK."
 } catch {
-  Write-ErrAndExit "Test-WSMan failed: $($_.Exception.Message)"
+    Write-ErrAndExit "TCP connectivity check FAILED to ${TargetHost}:${Port}. Is firewall blocking the port or host unreachable? Details: $($_.Exception.Message)"
+} finally {
+    if ($tcpClient) {
+        $tcpClient.Close()
+    }
 }
 
-# 3) Basic remote command to verify auth (Invoke-Command)
+
+# 2) Basic remote command to verify auth (Invoke-Command)
 Write-Host "-> Attempting a small remote command to check authentication..."
 $secpasswd = ConvertTo-SecureString $Password -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($User, $secpasswd)
 
 $invokeSucceeded = $false
+$protocol = if ($Https) { "https" } else { "http" }
+$connectionUri = "${protocol}://${TargetHost}:${Port}/wsman"
+
 try {
-  $sessionOptions = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
+  $sessionOptions = New-PSSessionOption -SkipCACheck -SkipCNCheck
   if ($UseNtlm) {
     # try with Negotiate (which will use NTLM on workgroup)
-    $s = New-PSSession -ComputerName $Host -Credential $cred -Authentication Negotiate -UseSSL:$Https -Port $Port -SessionOption $sessionOptions -ErrorAction Stop
+    $s = New-PSSession -ConnectionUri $connectionUri -Credential $cred -Authentication Negotiate -SessionOption $sessionOptions -ErrorAction Stop
   } else {
     # basic auth
-    $s = New-PSSession -ComputerName $Host -Credential $cred -Authentication Basic -UseSSL:$Https -Port $Port -SessionOption $sessionOptions -ErrorAction Stop
+    $s = New-PSSession -ConnectionUri $connectionUri -Credential $cred -Authentication Basic -SessionOption $sessionOptions -ErrorAction Stop
   }
 
   Invoke-Command -Session $s -ScriptBlock { whoami; (Get-ChildItem Env:COMPUTERNAME).Value } -ErrorAction Stop | ForEach-Object { Write-Host "   -> $_" }
@@ -87,11 +91,11 @@ if ($Production) {
 
   # verify the remote listener certificate matches the thumbprint (best-effort)
   try {
-    $remoteThumb = Invoke-Command -ComputerName $Host -Credential $cred -ScriptBlock {
+    $remoteThumb = Invoke-Command -ConnectionUri $connectionUri -Credential $cred -ScriptBlock {
       $listeners = winrm enumerate winrm/config/listener
       # try to parse certificate thumbprint
       $listeners | Select-String -Pattern "CertificateThumbprint"
-    } -Authentication Negotiate -UseSSL:$true -Port $Port -ErrorAction Stop
+    } -Authentication Negotiate -ErrorAction Stop
 
     if ($remoteThumb -and ($remoteThumb.ToString() -match $CertThumbprint)) {
       Write-Host "   Remote listener certificate thumbprint appears to match."
@@ -104,9 +108,9 @@ if ($Production) {
 
   # Ensure AllowUnencrypted is not enabled on server
   try {
-    $allowUnencrypted = Invoke-Command -ComputerName $Host -Credential $cred -ScriptBlock {
+    $allowUnencrypted = Invoke-Command -ConnectionUri $connectionUri -Credential $cred -ScriptBlock {
       (winrm get winrm/config/service) -match "AllowUnencrypted"
-    } -Authentication Negotiate -UseSSL:$true -Port $Port -ErrorAction Stop
+    } -Authentication Negotiate -ErrorAction Stop
 
     if ($allowUnencrypted -and $allowUnencrypted.ToString() -match "AllowUnencrypted = true") {
       Write-ErrAndExit "Production policy violation: WinRM AllowUnencrypted is true on remote host. Disable it for production."
