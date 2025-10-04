@@ -1,88 +1,129 @@
-<#
-  Run on the Hyper-V host (as Administrator).
-  Example:
-    .\setup_winrm.ps1 -Production:$false
-    .\setup_winrm.ps1 -Production:$true -CertSubject "CN=hyperv.example.local"
-#>
-
 param(
-  [switch]$Production,
-  [string]$CertSubject = "CN=hyperv.local",
-  [switch]$CreateSelfSignedCert
+    [switch]$Production
 )
 
-function Fail($m) { Write-Error $m; exit 1 }
-
-Write-Host "Beginning WinRM & firewall setup. Production=$Production"
-
-# 1) Ensure WinRM service and basic config
-Write-Host "-> Enabling WinRM service and basic config..."
-try {
-  winrm quickconfig -q
-} catch {
-  Fail "Failed to run winrm quickconfig: $_"
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Warning "Run this script as Administrator. Exiting."
+    exit 1
 }
 
-# 2) Adjust authentication settings
-Write-Host "-> Configuring auth settings..."
-# Allow Negotiate (NTLM) and Basic if required
-winrm set winrm/config/service/auth '@{Negotiate="true"}' | Out-Null
+Write-Host "`n--- Safe WinRM Setup (project-aware) ---`n" -ForegroundColor Cyan
+
+function Get-Listeners {
+    $list = @()
+    Get-ChildItem WSMan:\localhost\Listener -ErrorAction SilentlyContinue | ForEach-Object {
+        $ks = $_.Keys
+        $obj = [ordered]@{ Keys = $ks }
+        foreach ($k in $ks) {
+            if ($k -match '^Address=(.+)$') { $obj.Address = $Matches[1] }
+            elseif ($k -match '^Transport=(.+)$') { $obj.Transport = $Matches[1] }
+            elseif ($k -match '^Port=(\d+)$') { $obj.Port = [int]$Matches[1] }
+            elseif ($k -match '^CertificateThumbprint=(.+)$') { $obj.CertificateThumbprint = $Matches[1] }
+        }
+        $list += (New-Object PSObject -Property $obj)
+    }
+    return $list
+}
+
+function Ensure-FirewallRuleForPort {
+    param($Name, $Port)
+
+    $existing = Get-NetFirewallRule -ErrorAction SilentlyContinue | ForEach-Object {
+        $r = $_
+        try { $pf = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $r -ErrorAction SilentlyContinue } catch { $pf = $null }
+        if ($pf -and ($pf.LocalPort -eq $Port)) { return $r }
+    } | Select-Object -First 1
+
+    if (-not $existing) {
+        Write-Host "Creating firewall rule '$Name' for TCP $Port..."
+        New-NetFirewallRule -Name $Name -DisplayName $Name -Profile Any -Direction Inbound -Action Allow -Protocol TCP -LocalPort $Port | Out-Null
+    } else {
+        if ($existing.Enabled -ne 'True') {
+            Write-Host "Enabling existing firewall rule '$($existing.DisplayName)' for TCP $Port..."
+            Set-NetFirewallRule -Name $existing.Name -Enabled True
+        } else {
+            Write-Host "✅ Firewall rule for TCP $Port already exists and is enabled."
+        }
+    }
+}
+
+# Expected config
+if ($Production) {
+    $expected = @{ Port = 5986; Transport = "HTTPS" }
+    Write-Host "Mode: Production (HTTPS/${expected.Port})" -ForegroundColor Yellow
+} else {
+    $expected = @{ Port = 5985; Transport = "HTTP" }
+    Write-Host "Mode: Non-production (HTTP/${expected.Port})" -ForegroundColor Yellow
+}
+
+$listeners = Get-Listeners
+Write-Host "`nExisting WSMan listeners:"
+if ($listeners.Count -eq 0) { Write-Host "  (none found)" } else { $listeners | Format-Table Port,Transport,Address,CertificateThumbprint -AutoSize }
+
+$match = $listeners | Where-Object { $_.Port -eq $expected.Port -and $_.Transport -eq $expected.Transport } | Select-Object -First 1
+
+if ($match) {
+    Write-Host "`n✅ Expected listener already present: $($match.Transport):$($match.Port)"
+} else {
+    Write-Host "`nCreating expected listener $($expected.Transport):$($expected.Port)..."
+    if ($expected.Transport -eq "HTTP") {
+        New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address="*"; Transport="HTTP"} -ValueSet @{Port=$expected.Port} | Out-Null
+    } else {
+        $cert = Get-ChildItem Cert:\LocalMachine\My | Select-Object -First 1
+        if (-not $cert) { throw "No certificate found in LocalMachine\My for HTTPS listener." }
+        New-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address="*"; Transport="HTTPS"} -ValueSet @{Port=$expected.Port; CertificateThumbprint=$cert.Thumbprint} | Out-Null
+    }
+}
+
+# Configure auth
 if (-not $Production) {
-  # for non-prod convenience allow Basic and unencrypted if explicit
-  winrm set winrm/config/service/auth '@{Basic="true"}' | Out-Null
-  winrm set winrm/config/service '@{AllowUnencrypted="true"}' | Out-Null
-  Write-Host "   Non-production: Basic+AllowUnencrypted enabled (for testing only)."
+    Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
+    Set-Item -Path WSMan:\localhost\Service\AllowUnencrypted -Value $true
+    Set-Item -Path WSMan:\localhost\Client\TrustedHosts -Value "*" -Force
+    Write-Host "Configured Basic + AllowUnencrypted and TrustedHosts='*'."
 } else {
-  # production: do not allow unencrypted
-  winrm set winrm/config/service/auth '@{Basic="false"}' | Out-Null
-  winrm set winrm/config/service '@{AllowUnencrypted="false"}' | Out-Null
-  Write-Host "   Production: Basic and AllowUnencrypted disabled."
+    Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $false
+    Set-Item -Path WSMan:\localhost\Service\AllowUnencrypted -Value $false
+    Write-Host "Configured secure WinRM service (Production)."
 }
 
-# 3) Firewall rules for WinRM
-Write-Host "-> Opening firewall ports 5985 (HTTP) and 5986 (HTTPS) for WinRM..."
-New-NetFirewallRule -DisplayName "WinRM HTTP-In"  -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5985 -Profile Any -ErrorAction SilentlyContinue | Out-Null
-New-NetFirewallRule -DisplayName "WinRM HTTPS-In" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5986 -Profile Any -ErrorAction SilentlyContinue | Out-Null
+# Firewall
+$fwName = if ($expected.Transport -eq "HTTP") { "WinRM-HTTP-In-TCP" } else { "WinRM-HTTPS-In-TCP" }
+Ensure-FirewallRuleForPort -Name $fwName -Port $expected.Port
 
-# 4) Setup HTTPS listener for production (requires certificate)
-if ($Production) {
-  Write-Host "-> Production: ensuring HTTPS listener and certificate..."
-  # either find an existing cert matching subject or create a self-signed one (if requested)
-  $cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object { $_.Subject -like "*$CertSubject*" } | Select-Object -First 1
-  if (-not $cert -and $CreateSelfSignedCert) {
-    Write-Host "   No existing cert found; creating self-signed cert for $CertSubject (valid 2 years)."
-    $cert = New-SelfSignedCertificate -DnsName ($CertSubject -replace "CN=","") -CertStoreLocation Cert:\LocalMachine\My -NotAfter (Get-Date).AddYears(2)
-    if (-not $cert) { Fail "Could not create self-signed certificate." }
-  }
-  if (-not $cert) { Fail "No certificate available for HTTPS listener; supply certificate before proceeding." }
+Write-Host "`n--- Final listener set ---"
+(Get-Listeners) | Format-Table Port,Transport,Address,CertificateThumbprint -AutoSize
 
-  $thumb = $cert.Thumbprint
-  Write-Host "   Using certificate thumbprint: $thumb"
-
-  # Create HTTPS listener
-  # Remove existing winrm HTTPS listener to avoid duplicates
-  try { winrm delete winrm/config/Listener?Address=*+Transport=HTTPS 2>$null } catch {}
-  winrm create winrm/config/Listener?Address=*+Transport=HTTPS "@{Hostname=''; CertificateThumbprint='$thumb'}" | Out-Null
-
-  # ensure service uses certificate and disallow unencrypted
-  winrm set winrm/config/service '@{AllowUnencrypted="false"}' | Out-Null
-  Write-Host "   HTTPS WinRM listener created with cert."
-  Write-Host "-> IMPORTANT: If your Terraform runner is external, ensure the runner trusts this certificate (add to trusted root or set provider insecure=true for testing)."
-} else {
-  # non-prod: create HTTP listener if not present
-  Write-Host "-> Ensuring HTTP listener exists (non-production)..."
-  try { winrm delete winrm/config/Listener?Address=*+Transport=HTTP 2>$null } catch {}
-  winrm create winrm/config/Listener?Address=*+Transport=HTTP "@{Hostname='';Port='5985'}" | Out-Null
-  Write-Host "   HTTP listener configured on 5985 (AllowUnencrypted enabled for testing)."
+# Connectivity test
+function Get-LocalIPv4 {
+    $cand = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -notmatch '^127\.' -and $_.AddressState -eq 'Preferred' }
+    if ($cand) {
+        $v = $cand | Where-Object { $_.InterfaceAlias -match 'vEthernet' } | Select-Object -First 1
+        if ($v) { return $v.IPAddress }
+        return ($cand | Select-Object -First 1).IPAddress
+    }
+    return $null
 }
 
-# 5) Ensure network bindings: advise to check vEthernet adapter after external switch creation
-Write-Host "`nSetup complete. Next steps (manual verification recommended):"
-Write-Host " - Run 'winrm enumerate winrm/config/listener' to view listeners."
-Write-Host " - Run 'Get-NetFirewallRule -DisplayName \"WinRM *\" | Format-Table' to confirm firewall."
-Write-Host " - If you use an HTTPS self-signed cert, add it to the runner's Trusted Root CA store or set insecure connection on the client."
-Write-Host " - If using an External VSwitch, ensure the host's vEthernet adapter has proper IP (run Get-NetIPAddress -InterfaceAlias \"vEthernet (<SwitchName>)\")."
+$localIP = Get-LocalIPv4
+if ($localIP) {
+    Write-Host "`nTesting connectivity to ${localIP}:$($expected.Port)..."
+    $tn = Test-NetConnection -ComputerName $localIP -Port $expected.Port -WarningAction SilentlyContinue
+    Write-Host "TcpTestSucceeded : $($tn.TcpTestSucceeded)"
+} else {
+    Write-Warning "No suitable IPv4 address found for test."
+}
 
-if ($Production) {
-  Write-Host "Production certificate thumbprint: $thumb"
+# Connection info
+Write-Host "`n--- Connection Info ---" -ForegroundColor Cyan
+if ($localIP) { Write-Host "Host: $localIP" }
+Write-Host "Port: $($expected.Port)"
+Write-Host "Transport: $($expected.Transport)"
+
+if ($expected.Transport -eq "HTTPS") {
+    Write-Host "`nLinux/macOS client:"
+    Write-Host "  winrm-cli -hostname $localIP -port $($expected.Port) -username Administrator -password '<Password>' -https -insecure"
+} else {
+    Write-Host "`nLinux/macOS client:"
+    Write-Host "  winrm-cli -hostname $localIP -port $($expected.Port) -username Administrator -password '<Password>' -insecure"
 }

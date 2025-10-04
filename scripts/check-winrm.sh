@@ -1,26 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script validates WinRM connectivity using winrm-cli.
+# This script validates WinRM connectivity using winrm-cli and enumerates active WSMan listeners.
 
-#--- Parameters --------------------------------------------------------------
 TARGET_HOST=""
-PORT=""
 USER=""
 PASSWORD=""
-USE_HTTPS=false
 USE_NTLM=false
 PRODUCTION=false
-CERT_THUMBPRINT=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -TargetHost)
             TARGET_HOST="$2"
-            shift 2
-            ;;
-        -Port)
-            PORT="$2"
             shift 2
             ;;
         -User)
@@ -31,10 +23,6 @@ while [[ $# -gt 0 ]]; do
             PASSWORD="$2"
             shift 2
             ;;
-        -Https)
-            USE_HTTPS=true
-            shift
-            ;;
         -UseNtlm)
             USE_NTLM=true
             shift
@@ -43,10 +31,6 @@ while [[ $# -gt 0 ]]; do
             PRODUCTION=true
             shift
             ;;
-        -CertThumbprint)
-            CERT_THUMBPRINT="$2"
-            shift 2
-            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
@@ -54,37 +38,68 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-#--- Helper functions --------------------------------------------------------
 log() { echo "[$(date +%T)] $*"; }
 err_exit() { log "❌ $1"; exit 1; }
 
-#--- 1) TCP connectivity ----------------------------------------------------
-log "Checking TCP connectivity to ${TARGET_HOST}:${PORT} ..."
-if ! timeout 5 bash -c "cat < /dev/null > /dev/tcp/${TARGET_HOST}/${PORT}" 2>/dev/null; then
-    err_exit "TCP connection failed"
+#--- Enumerate available WSMan listeners -----------------------------------
+log "Enumerating WinRM listeners on ${TARGET_HOST}..."
+
+# We will try both default ports; later you can add custom ones
+PORTS=(5985 5986)
+AVAILABLE_LISTENERS=()
+
+for PORT in "${PORTS[@]}"; do
+    if timeout 5 bash -c "cat < /dev/null > /dev/tcp/${TARGET_HOST}/${PORT}" 2>/dev/null; then
+        AVAILABLE_LISTENERS+=($PORT)
+    fi
+done
+
+if [[ ${#AVAILABLE_LISTENERS[@]} -eq 0 ]]; then
+    err_exit "No reachable WinRM listeners on default ports (5985/5986)."
 fi
-log "✅ TCP OK"
 
-#--- 2) Basic WinRM endpoint test -------------------------------------------
-PROTO="http"
-if [[ "$USE_HTTPS" == "true" ]]; then PROTO="https"; fi
+log "✅ Reachable ports: ${AVAILABLE_LISTENERS[*]}"
 
-log "Testing WSMan endpoint (${PROTO}://${TARGET_HOST}:${PORT}/wsman) ..."
+#--- Select the preferred listener ------------------------------------------
+# Prefer HTTPS if available
+if [[ " ${AVAILABLE_LISTENERS[@]} " =~ "5986" ]]; then
+    PORT=5986
+    PROTO=https
+else
+    PORT=5985
+    PROTO=http
+fi
+
+log "Using listener: ${PROTO}://${TARGET_HOST}:${PORT}"
+
+#--- Test WinRM handshake ---------------------------------------------------
 WINRM_FLAGS=""
-if [[ "$USE_NTLM" == "true" ]]; then WINRM_FLAGS="-ntlm"; fi
-if [[ "$USE_HTTPS" == "true" ]]; then WINRM_FLAGS="$WINRM_FLAGS -https"; fi
+[[ "$USE_NTLM" == true ]] && WINRM_FLAGS="-ntlm"
+[[ "$PROTO" == "https" ]] && WINRM_FLAGS="$WINRM_FLAGS -https"
 
+log "Testing WinRM handshake with ping..."
 if ! ~/go/bin/winrm-cli \
-        -hostname "${TARGET_HOST}" \
-        -port "${PORT}" \
-        -username "${USER}" \
-        -password "${PASSWORD}" \
+        -hostname "$TARGET_HOST" \
+        -port "$PORT" \
+        -username "$USER" \
+        -password "$PASSWORD" \
         -insecure \
         $WINRM_FLAGS \
-        exec "whoami" >/dev/null; then
-    err_exit "WSMan endpoint not reachable or authentication failed"
+        whoami; then
+    err_exit "WinRM handshake failed (listener unreachable or authentication failed)"
 fi
-log "✅ WSMan endpoint reachable and authentication successful"
+
+log "✅ WinRM handshake successful"
+
+#--- Optional: enumerate all listeners on the host --------------------------
+log "Detected WinRM listeners on ${TARGET_HOST}:"
+for LP in "${AVAILABLE_LISTENERS[@]}"; do
+    if [[ "$LP" == "5986" ]]; then
+        log " - HTTPS listener on port $LP"
+    else
+        log " - HTTP listener on port $LP"
+    fi
+done
 
 log "WinRM validation completed SUCCESSFULLY"
 exit 0
