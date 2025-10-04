@@ -1,5 +1,5 @@
-variable "hyperv_host" {
-  type = object({
+variable "hyperv_hosts" {
+  type = map(object({
     host            = string
     port            = optional(number, 5985)
     https           = optional(bool, false)
@@ -8,7 +8,7 @@ variable "hyperv_host" {
     user            = string
     password        = string
     cert_thumbprint = optional(string, "")
-  })
+  }))
   description = "A map of Hyper-V hosts to connect to."
   sensitive   = true
 }

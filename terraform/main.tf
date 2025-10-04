@@ -1,32 +1,24 @@
-module "validate_host" {
-  source = "./modules/validate-host"
-
-  production      = var.production
-  host            = var.hyperv_host.host
-  port            = var.hyperv_host.port
-  https           = var.hyperv_host.https
-  user            = var.hyperv_host.user
-  password        = var.hyperv_host.password
-  use_ntlm        = var.hyperv_host.use_ntlm
-  cert_thumbprint = var.hyperv_host.cert_thumbprint
+locals {
+  vms_by_host = {
+    for vm in var.host_vms : vm.host_key => vm...
+  }
 }
 
-module "vms" {
-  source   = "./modules/hyperv-vm"
-  for_each = { for vm in var.host_vms : vm.name => vm }
+module "host1" {
+  source = "./modules/hyperv-host"
 
   providers = {
-    hyperv = hyperv
+    hyperv = hyperv.host1
   }
 
-  vm             = each.value
+  host_config    = var.hyperv_hosts["host1"]
+  vms            = local.vms_by_host["host1"]
   iso_path       = var.iso_path
   cluster_switch = var.switch
-
-  depends_on = [module.validate_host]
+  production     = var.production
 }
 
-# Combine outputs
+# Combine outputs from all hosts
 locals {
-  all_vm_infos = [for vm in module.vms : vm.vm]
+  all_vm_infos = module.host1.vms
 }
