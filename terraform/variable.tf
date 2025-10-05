@@ -27,7 +27,8 @@ variable "host_vms" {
 }
 
 variable "api_vip" {
-  type = string
+  type        = string
+  description = "The endpoint (IP or DNS) for the Talos API server. This is typically a load balancer or VIP in front of control plane nodes."
 }
 
 variable "vm_memory" {
@@ -59,13 +60,28 @@ variable "talos_version" {
   type    = string
   default = "v1.11.2"
 }
-
-variable "iso_path" {
-  type = string
+variable "talos_extensions" {
+  type = list(string)
+  default = [
+    "amdgpu",
+    "tailscale",
+  ]
+  description = "List of Talos extensions to install."
 }
 
 variable "production" {
   type        = bool
   default     = false
   description = "If true, enforce production checks (HTTPS required, cert thumbprint required)"
+}
+
+variable "cluster_name" {
+  type        = string
+  description = "The name of the Talos cluster."
+}
+
+variable "iso_path" {
+  type        = string
+  description = "Path to the Talos ISO image."
+  default     = "C:/Users/Public/metal-amd64.iso" # Update with the actual path to your Talos ISO
 }
