@@ -12,7 +12,6 @@
   ansible.builtin.pip:
     name: pywinrm
     state: present
-    executable: python3 -m pip
   become: true
   delegate_to: localhost
 
