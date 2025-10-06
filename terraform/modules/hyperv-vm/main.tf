@@ -8,7 +8,7 @@ locals {
 }
 
 resource "hyperv_vhd" "disk" {
-  path = "C:/Hyper-V/${var.vm.name}.vhdx"
+  path = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
   size = var.vm.disk_gb * 1024 * 1024 * 1024
 }
 
@@ -48,7 +48,7 @@ resource "hyperv_machine_instance" "vm" {
   hard_disk_drives {
     controller_number   = 0
     controller_location = 0
-    path                = "C:/Hyper-V/${var.vm.name}.vhdx"
+    path                = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
   }
 
   vm_firmware {
