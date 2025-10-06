@@ -1,4 +1,10 @@
 ---
+- name: Install Python
+  ansible.builtin.package:
+    name: python3
+    state: present
+  become: true
+
 - name: Install pywinrm
   ansible.builtin.pip:
     name: pywinrm
