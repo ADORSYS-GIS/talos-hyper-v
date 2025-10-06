@@ -4,6 +4,7 @@
     name: python3
     state: present
   become: true
+  delegate_to: localhost
 
 - name: Install pywinrm
   ansible.builtin.pip:
