@@ -83,5 +83,4 @@ variable "cluster_name" {
 variable "iso_path" {
   type        = string
   description = "Path to the Talos ISO image."
-  default     = "C:/Users/Public/metal-amd64.iso" # Update with the actual path to your Talos ISO
 }

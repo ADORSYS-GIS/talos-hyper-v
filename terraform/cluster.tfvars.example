@@ -10,10 +10,10 @@ hyperv_host = {
 }
 
 # Talos version
-talos_version = "v1.5.0"
+talos_version = "v1.11.2"
 
 # Path to the Talos ISO image
-iso_path = "C:/path/to/your/talos-metal-amd64.iso" # Update with the actual path to your Talos ISO
+iso_path = "C:/Users/Public/metal-amd64.iso" # Update with the actual path to your Talos ISO
 
 # VM definitions
 host_vms = [

@@ -19,10 +19,12 @@ output "kubeconfig" {
   description = "The generated kubeconfig for the cluster."
 }
 
-# output "schematic_id" {
-#   value = module.talos_image_factory.schematic_id
-# }
+output "talos_iso_url" {
+  value       = module.talos_image_factory.iso_url
+  description = "The URL of the generated Talos ISO image."
+}
 
-# output "installer_image" {
-#   value = module.talos_image_factory.installer_url
-# }
+output "talos_schematic_id" {
+  value       = module.talos_image_factory.schematic_id
+  description = "The ID of the generated Talos schematic."
+}

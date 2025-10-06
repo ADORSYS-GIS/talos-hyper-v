@@ -37,3 +37,4 @@ module "talos_cluster" {
 
   depends_on = [module.host1]
 }
+
