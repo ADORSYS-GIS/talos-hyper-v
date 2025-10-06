@@ -1,7 +1,9 @@
 ---
-- name: Install Python
+- name: Install Python and pip
   ansible.builtin.package:
-    name: python3
+    name:
+      - python3
+      - python3-pip
     state: present
   become: true
   delegate_to: localhost
@@ -10,11 +12,13 @@
   ansible.builtin.pip:
     name: pywinrm
     state: present
+    executable: python3 -m pip
+  become: true
   delegate_to: localhost
 
 - name: Set Terraform version
   ansible.builtin.set_fact:
-    terraform_version: "1.7.5" # You can change this to the desired version
+    terraform_version: "1.7.5"
   delegate_to: localhost
 
 - name: Download Terraform
@@ -23,12 +27,12 @@
     dest: /usr/local/bin
     remote_src: yes
     creates: /usr/local/bin/terraform
-  delegate_to: localhost
   become: true
+  delegate_to: localhost
 
 - name: Set talosctl version
   ansible.builtin.set_fact:
-    talosctl_version: "1.7.5" # You can change this to the desired version
+    talosctl_version: "1.7.5"
   delegate_to: localhost
 
 - name: Download talosctl
@@ -37,5 +41,5 @@
     dest: /usr/local/bin
     remote_src: yes
     creates: /usr/local/bin/talosctl
-  delegate_to: localhost
   become: true
+  delegate_to: localhost
