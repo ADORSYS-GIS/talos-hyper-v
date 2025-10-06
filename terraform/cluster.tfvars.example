@@ -1,25 +1,28 @@
-# Hyper-V host connection details
-hyperv_host = {
-  host     = "192.168.10.2"
-  user     = "Administrator"
-  password = "hyperv237!"
-  port     = 5985
-  https    = false
-  insecure = true
-  use_ntlm = false
+
+hyperv_hosts = {
+  "host1" = {
+    host     = "100.116.65.14"
+    user     = ""
+    password = ""
+    port     = 5985
+    https    = false
+    insecure = true
+    use_ntlm = false
+  }
 }
 
 # Talos version
 talos_version = "v1.11.2"
 
-# Path to the Talos ISO image
-iso_path = "C:/Users/Public/metal-amd64.iso" # Update with the actual path to your Talos ISO
+# iso path
+iso_path = "C:/Hyper-V/Isos/factory-metal-amd64.iso" # Update with the actual path to your Talos ISO
 
-# VM definitions
+
+# VM definitions per host
 host_vms = [
-  { name = "talos-cp1", role = "controlplane,master", ip = "192.168.10.101" },
-  { name = "talos-wk1", role = "worker", ip = "192.168.10.201" },
-  { name = "talos-wk2", role = "worker", ip = "192.168.10.202" }
+  { name = "talos-cp1", role = "controlplane", host_key = "host1", ip = "192.168.1.201", memory = 8192 },
+  { name = "talos-wk1", role = "worker", host_key = "host1", ip = "192.168.1.202" },
+  { name = "talos-wk2", role = "worker", host_key = "host1", ip = "192.168.1.203" }
 ]
 
 # Shared cluster settings
