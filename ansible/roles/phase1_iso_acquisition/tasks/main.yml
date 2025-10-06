@@ -1,8 +1,15 @@
 ---
 - name: Read iso_path from cluster.tfvars
   ansible.builtin.set_fact:
-    iso_path_from_tfvars: "{{ lookup('file', '{{ playbook_dir }}/../terraform/cluster.tfvars') | regex_search('iso_path = \"(.*?)\"', '\\1') | first }}"
+    iso_path_from_tfvars: "{{ lookup('file', '{{ terraform_dir }}/cluster.tfvars') | regex_search('iso_path = \"(.*?)\"', '\\1') | first }}"
   delegate_to: localhost
+
+- name: Initialize Terraform modules and providers
+  ansible.builtin.command:
+    cmd: terraform init
+    chdir: "{{ terraform_dir }}"
+  delegate_to: localhost
+  register: terraform_init_result
 
 - name: Execute terraform apply for talos_image_factory
   ansible.builtin.command: "terraform apply -target=module.talos_image_factory -var-file=cluster.tfvars -auto-approve"

@@ -8,7 +8,7 @@
 
 - name: Read VM names and IPs from cluster.tfvars
   ansible.builtin.set_fact:
-    host_vms: "{{ lookup('file', '{{ playbook_dir }}/../terraform/cluster.tfvars') | regex_findall('name = \"(.*?)\", role = \".*?\", ip = \"(.*?)\"', multiline=True) }}"
+    host_vms: "{{ lookup('file', '{{ terraform_dir }}/cluster.tfvars') | regex_findall('name = \"(.*?)\", role = \".*?\", ip = \"(.*?)\"', multiline=True) }}"
   delegate_to: localhost
 
 - name: Verify VMs are running on Hyper-V host

@@ -8,7 +8,7 @@
 
 - name: Extract controlplane IPs from cluster.tfvars
   ansible.builtin.set_fact:
-    controlplane_ips: "{{ lookup('file', '{{ playbook_dir }}/../terraform/cluster.tfvars') | regex_findall('name = \".*?\", role = \"controlplane.*\", ip = \"(.*?)\"', multiline=True) | flatten }}"
+    controlplane_ips: "{{ lookup('file', '{{ terraform_dir }}/cluster.tfvars') | regex_findall('name = \".*?\", role = \"controlplane.*\", ip = \"(.*?)\"', multiline=True) | flatten }}"
   delegate_to: localhost
 
 - name: Wait for Talos cluster to be healthy
