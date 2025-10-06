@@ -42,7 +42,7 @@
   delegate_to: localhost
 
 - name: Download talosctl
-  ansansible.builtin.get_url:
+  ansible.builtin.get_url:
     url: 'https://factory.talos.dev/talosctl/v{{ talosctl_version }}/talosctl-linux-arm64'
     dest: /usr/local/bin/talosctl
     mode: '0755'
