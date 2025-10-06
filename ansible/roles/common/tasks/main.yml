@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name: unzip
     state: present
+  delegate_to: localhost
 
 - name: Install Python and pip
   ansible.builtin.package:
@@ -22,12 +23,12 @@
 
 - name: Set Terraform version
   ansible.builtin.set_fact:
-    terraform_version: "1.7.5"
+    terraform_version: '1.7.5'
   delegate_to: localhost
 
 - name: Download Terraform
   ansible.builtin.unarchive:
-    src: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+    src: 'https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip'
     dest: /usr/local/bin
     remote_src: yes
     creates: /usr/local/bin/terraform
@@ -36,12 +37,12 @@
 
 - name: Set talosctl version
   ansible.builtin.set_fact:
-    talosctl_version: "1.7.5"
+    talosctl_version: '1.7.5'
   delegate_to: localhost
 
 - name: Download talosctl
   ansible.builtin.unarchive:
-    src: "https://github.com/siderolabs/talos/releases/download/v{{ talosctl_version }}/talosctl-linux-amd64.tar.gz"
+    src: 'https://github.com/siderolabs/talos/releases/download/v{{ talosctl_version }}/talosctl-linux-amd64.tar.gz'
     dest: /usr/local/bin
     remote_src: yes
     creates: /usr/local/bin/talosctl
