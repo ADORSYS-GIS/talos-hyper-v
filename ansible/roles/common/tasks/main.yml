@@ -1,4 +1,9 @@
 ---
+- name: Ensure 'unzip' is installed
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+
 - name: Install Python and pip
   ansible.builtin.package:
     name:
