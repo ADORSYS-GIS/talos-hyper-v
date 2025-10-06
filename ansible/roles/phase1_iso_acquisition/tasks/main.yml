@@ -1,0 +1,54 @@
+---
+- name: Read iso_path from cluster.tfvars
+  ansible.builtin.set_fact:
+    iso_path_from_tfvars: "{{ lookup('file', '{{ playbook_dir }}/../terraform/cluster.tfvars') | regex_search('iso_path = \"(.*?)\"', '\\1') | first }}"
+  delegate_to: localhost
+
+- name: Execute terraform apply for talos_image_factory
+  ansible.builtin.command: "terraform apply -target=module.talos_image_factory -var-file=cluster.tfvars -auto-approve"
+  args:
+    chdir: "{{ terraform_dir }}"
+  register: tf_image_factory_output
+  delegate_to: localhost
+
+- name: Get Talos ISO URL
+  ansible.builtin.command: "terraform output -json talos_iso_url"
+  args:
+    chdir: "{{ terraform_dir }}"
+  register: tf_iso_url_output
+  delegate_to: localhost
+
+- name: Set Talos ISO URL fact
+  ansible.builtin.set_fact:
+    talos_iso_url: "{{ tf_iso_url_output.stdout | from_json }}"
+  delegate_to: localhost
+
+- name: Display ISO download instructions
+  ansible.builtin.pause:
+    prompt: |
+      ================================================================================
+      PHASE 1: ISO ACQUISITION
+
+      Please download the Talos ISO from the following URL and place it on your
+      Hyper-V host at the specified path:
+
+      ISO Download URL: {{ talos_iso_url }}
+      Expected Path on Hyper-V Host: {{ iso_path_from_tfvars }}
+
+      Once the ISO is downloaded and placed, type 'yes' to continue.
+      ================================================================================
+    echo: yes
+  delegate_to: localhost
+
+- name: Check for ISO file existence on Hyper-V host
+  ansible.windows.win_stat:
+    path: "{{ iso_path_from_tfvars }}"
+  register: iso_file_stat
+  until: iso_file_stat.stat.exists
+  retries: 60
+  delay: 10
+
+- name: Notify user that ISO file is found
+  ansible.builtin.debug:
+    msg: "Talos ISO file found at {{ iso_path_from_tfvars }} on the Hyper-V host."
+  delegate_to: localhost

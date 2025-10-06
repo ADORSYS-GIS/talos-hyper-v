@@ -26,6 +26,18 @@ resource "hyperv_machine_instance" "vm" {
     switch_name        = var.cluster_switch
     static_mac_address = local.mac
   }
+  vm_processor {
+    compatibility_for_migration_enabled               = false
+    compatibility_for_older_operating_systems_enabled = false
+    enable_host_resource_protection                   = false
+    expose_virtualization_extensions                  = false
+    hw_thread_count_per_core                          = 0
+    maximum                                           = 100
+    maximum_count_per_numa_node                       = 16
+    maximum_count_per_numa_socket                     = 1
+    relative_weight                                   = 100
+    reserve                                           = 0
+  }
 
   dvd_drives {
     controller_number   = 0

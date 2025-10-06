@@ -1,0 +1,27 @@
+---
+- name: Deploy Talos Cluster on Hyper-V
+  hosts: hyperv-host01
+  gather_facts: false
+
+  pre_tasks:
+    - name: Include common dependencies role
+      include_role:
+        name: common
+  
+    - name: Set terraform_dir for localhost tasks
+      ansible.builtin.set_fact:
+        terraform_dir: "{{ playbook_dir }}/../terraform"
+      delegate_to: localhost
+
+  tasks:
+    - name: Phase 1 - Get Talos ISO
+      include_role:
+        name: phase1_iso_acquisition
+
+    - name: Phase 2 - Create and Start VMs
+      include_role:
+        name: phase2_vm_creation
+
+    - name: Phase 3 - Provision Talos Cluster
+      include_role:
+        name: phase3_talos_provisioning

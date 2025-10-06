@@ -1,0 +1,34 @@
+---
+- name: Install pywinrm
+  ansible.builtin.pip:
+    name: pywinrm
+    state: present
+  delegate_to: localhost
+
+- name: Set Terraform version
+  ansible.builtin.set_fact:
+    terraform_version: "1.7.5" # You can change this to the desired version
+  delegate_to: localhost
+
+- name: Download Terraform
+  ansible.builtin.unarchive:
+    src: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+    dest: /usr/local/bin
+    remote_src: yes
+    creates: /usr/local/bin/terraform
+  delegate_to: localhost
+  become: true
+
+- name: Set talosctl version
+  ansible.builtin.set_fact:
+    talosctl_version: "1.7.5" # You can change this to the desired version
+  delegate_to: localhost
+
+- name: Download talosctl
+  ansible.builtin.unarchive:
+    src: "https://github.com/siderolabs/talos/releases/download/v{{ talosctl_version }}/talosctl-linux-amd64.tar.gz"
+    dest: /usr/local/bin
+    remote_src: yes
+    creates: /usr/local/bin/talosctl
+  delegate_to: localhost
+  become: true
