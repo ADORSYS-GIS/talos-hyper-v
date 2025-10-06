@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name: unzip
     state: present
+  become: true
   delegate_to: localhost
 
 - name: Install Python and pip
@@ -37,14 +38,14 @@
 
 - name: Set talosctl version
   ansible.builtin.set_fact:
-    talosctl_version: '1.7.5'
+    talosctl_version: '1.11.2'
   delegate_to: localhost
 
 - name: Download talosctl
-  ansible.builtin.unarchive:
-    src: 'https://github.com/siderolabs/talos/releases/download/v{{ talosctl_version }}/talosctl-linux-amd64.tar.gz'
-    dest: /usr/local/bin
-    remote_src: yes
-    creates: /usr/local/bin/talosctl
+  ansansible.builtin.get_url:
+    url: 'https://factory.talos.dev/talosctl/v{{ talosctl_version }}/talosctl-linux-arm64'
+    dest: /usr/local/bin/talosctl
+    mode: '0755'
+    force: true
   become: true
   delegate_to: localhost
