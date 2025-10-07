@@ -3,22 +3,6 @@ locals {
     for vm in var.host_vms : vm.host_key => vm...
   }
 }
-
-module "host1" {
-  source = "./modules/hyperv-host"
-
-  providers = {
-    hyperv = hyperv.host1
-  }
-
-  host_config    = var.hyperv_hosts["host1"]
-  vms            = local.vms_by_host["host1"]
-  iso_path       = var.iso_path
-  cluster_switch = var.switch
-  production     = var.production
-}
-
-# Combine outputs from all hosts
 module "talos_image_factory" {
   source = "./modules/talos-image-factory"
 
@@ -36,6 +20,6 @@ module "talos_cluster" {
   cluster_endpoint       = "https://${var.talos_vip}:6443"
   talos_vip              = var.talos_vip
 
-  depends_on = [module.host1]
+  depends_on = [local.host_modules]
 }
 

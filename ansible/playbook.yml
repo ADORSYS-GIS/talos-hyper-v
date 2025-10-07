@@ -7,10 +7,10 @@
     - name: Include common dependencies role
       include_role:
         name: common
-  
+
     - name: Set terraform_dir for localhost tasks
       ansible.builtin.set_fact:
-        terraform_dir: "{{ playbook_dir }}/../terraform"
+        terraform_dir: '{{ playbook_dir }}/../terraform'
       delegate_to: localhost
 
   tasks:
