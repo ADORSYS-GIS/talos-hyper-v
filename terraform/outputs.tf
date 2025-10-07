@@ -19,6 +19,12 @@ output "kubeconfig" {
   description = "The generated kubeconfig for the cluster."
 }
 
+output "talosconfig" {
+  value       = module.talos_cluster.talosconfig
+  sensitive   = true
+  description = "The generated talosconfig for the cluster."
+}
+
 output "talos_iso_url" {
   value       = module.talos_image_factory.iso_url
   description = "The URL of the generated Talos ISO image."

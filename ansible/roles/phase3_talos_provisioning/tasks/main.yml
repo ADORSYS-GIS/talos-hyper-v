@@ -19,6 +19,19 @@
     dest: "{{ terraform_dir }}/kubeconfig"
   delegate_to: localhost
 
+- name: Get raw talosconfig from Terraform output
+  ansible.builtin.command: "terraform output -raw talosconfig"
+  args:
+    chdir: "{{ terraform_dir }}"
+  register: raw_talosconfig_output
+  delegate_to: localhost
+
+- name: Save raw talosconfig to file
+  ansible.builtin.copy:
+    content: "{{ raw_talosconfig_output.stdout }}"
+    dest: "{{ terraform_dir }}/talosconfig"
+  delegate_to: localhost
+
 - name: Notify user that Talos cluster is provisioned and healthy
   ansible.builtin.debug:
     msg: "Talos cluster is provisioned and healthy."
