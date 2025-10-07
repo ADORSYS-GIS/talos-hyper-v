@@ -8,8 +8,9 @@ locals {
 }
 
 resource "hyperv_vhd" "disk" {
-  path = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
-  size = var.vm.disk_gb * 1024 * 1024 * 1024
+  path     = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
+  size     = var.vm.disk_gb * 1024 * 1024 * 1024
+  vhd_type = "Dynamic"
 }
 
 resource "hyperv_machine_instance" "vm" {
@@ -21,22 +22,14 @@ resource "hyperv_machine_instance" "vm" {
 
   depends_on = [hyperv_vhd.disk]
 
+  lifecycle {
+    ignore_changes = all
+  }
+
   network_adaptors {
     name               = "${var.vm.name}-nic"
     switch_name        = var.cluster_switch
     static_mac_address = local.mac
-  }
-  vm_processor {
-    compatibility_for_migration_enabled               = false
-    compatibility_for_older_operating_systems_enabled = false
-    enable_host_resource_protection                   = false
-    expose_virtualization_extensions                  = false
-    hw_thread_count_per_core                          = 0
-    maximum                                           = 100
-    maximum_count_per_numa_node                       = 16
-    maximum_count_per_numa_socket                     = 1
-    relative_weight                                   = 100
-    reserve                                           = 0
   }
 
   dvd_drives {
