@@ -23,7 +23,7 @@ data "talos_client_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-  for_each = [for ip in var.controlplane_endpoints : ip]
+for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx + 1}" => ip }
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
@@ -32,7 +32,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
     <<-EOT
   machine:
     network:
-      hostname: talos-cp${each.key}
+      hostname: ${each.key}
       interfaces:
         - deviceSelector:
             physical: true
@@ -44,7 +44,8 @@ resource "talos_machine_configuration_apply" "controlplane" {
 }
 
 resource "talos_machine_configuration_apply" "worker" {
-  for_each = [for ip in var.worker_endpoints : ip]
+  for_each = { for idx, ip in var.worker_endpoints : "talos-wk${idx + 1}" => ip }
+
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
@@ -54,7 +55,7 @@ resource "talos_machine_configuration_apply" "worker" {
     <<-EOT
   machine:
     network:
-      hostname: talos-wk${each.key}
+      hostname: ${each.key}
       interfaces:
         - deviceSelector:
             physical: true
