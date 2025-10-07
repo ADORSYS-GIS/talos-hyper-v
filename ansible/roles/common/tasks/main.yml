@@ -49,3 +49,18 @@
     force: true
   become: true
   delegate_to: localhost
+
+
+- name: Set k9s version
+  ansible.builtin.set_fact:
+    k9s_version: '0.28.2'
+  delegate_to: localhost
+
+- name: Download k9s
+  ansible.builtin.unarchive:
+    src: 'https://github.com/derailed/k9s/releases/download/v{{ k9s_version }}/k9s_Linux_amd64.tar.gz'
+    dest: /usr/local/bin
+    remote_src: yes
+    creates: /usr/local/bin/k9s
+  become: true
+  delegate_to: localhost

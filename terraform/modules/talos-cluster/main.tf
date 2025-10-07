@@ -75,4 +75,8 @@ data "talos_cluster_health" "this" {
   control_plane_nodes  = var.controlplane_endpoints
   endpoints            = [var.cluster_endpoint]
   worker_nodes         = var.worker_endpoints
+
+  timeouts = {
+    read = "15m"
+  }
 }
