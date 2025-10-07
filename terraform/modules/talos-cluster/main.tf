@@ -28,6 +28,19 @@ resource "talos_machine_configuration_apply" "controlplane" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
   node                        = each.key
+  config_patches = var.talos_vip != "" ? [
+    <<-EOT
+  machine:
+    network:
+      interfaces:
+        - deviceSelector:
+            physical: true
+          dhcp: false
+          addresses: [${each.key}/24]
+          vip:
+            ip: ${var.talos_vip}
+  EOT
+  ] : []
 }
 
 resource "talos_machine_configuration_apply" "worker" {

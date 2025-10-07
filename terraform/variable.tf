@@ -26,9 +26,10 @@ variable "host_vms" {
   }))
 }
 
-variable "api_vip" {
+variable "talos_vip" {
   type        = string
-  description = "The endpoint (IP or DNS) for the Talos API server. This is typically a load balancer or VIP in front of control plane nodes."
+  description = "The virtual IP address for the Talos cluster."
+  default     = ""
 }
 
 variable "vm_memory" {

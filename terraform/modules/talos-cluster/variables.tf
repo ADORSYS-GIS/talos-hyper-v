@@ -20,6 +20,12 @@ variable "worker_endpoints" {
 }
 
 variable "cluster_endpoint" {
-  type = string
+  type        = string
   description = "The cluster endpoint URL."
+}
+
+variable "talos_vip" {
+  type        = string
+  description = "The virtual IP address for the Talos cluster."
+  default     = ""
 }

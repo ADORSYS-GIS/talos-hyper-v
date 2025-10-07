@@ -33,7 +33,8 @@ module "talos_cluster" {
   talos_version          = var.talos_version
   controlplane_endpoints = [for vm in var.host_vms : vm.ip if vm.role == "controlplane"]
   worker_endpoints       = [for vm in var.host_vms : vm.ip if vm.role == "worker"]
-  cluster_endpoint       = "https://${var.api_vip}:6443"
+  cluster_endpoint       = "https://${var.talos_vip}:6443"
+  talos_vip              = var.talos_vip
 
   depends_on = [module.host1]
 }
