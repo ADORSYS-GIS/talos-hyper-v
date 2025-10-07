@@ -6,7 +6,6 @@ data "talos_machine_configuration" "controlplane" {
   cluster_endpoint = var.cluster_endpoint
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   talos_version    = var.talos_version
-
 }
 
 data "talos_machine_configuration" "worker" {
@@ -53,4 +52,14 @@ resource "talos_cluster_kubeconfig" "this" {
   ]
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = var.controlplane_endpoints[0]
+}
+
+data "talos_cluster_health" "this" {
+  depends_on = [
+    talos_cluster_kubeconfig.this
+  ]
+  client_configuration = talos_machine_secrets.this.client_configuration
+  control_plane_nodes  = var.controlplane_endpoints
+  endpoints            = [var.cluster_endpoint]
+  worker_nodes         = var.worker_endpoints
 }

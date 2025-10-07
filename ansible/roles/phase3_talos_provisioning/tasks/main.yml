@@ -6,29 +6,17 @@
   register: tf_talos_provisioning_output
   delegate_to: localhost
 
-- name: Extract controlplane IPs from cluster.tfvars
-  ansible.builtin.set_fact:
-    controlplane_ips: "{{ lookup('file', '{{ terraform_dir }}/cluster.tfvars') | regex_findall('name = \".*?\", role = \"controlplane.*\", ip = \"(.*?)\"', multiline=True) | flatten }}"
-  delegate_to: localhost
-
-- name: Wait for Talos cluster to be healthy
-  ansible.builtin.command: "talosctl --talosconfig={{ terraform_dir }}/talosconfig health --nodes {{ controlplane_ips | join(',') }}"
+- name: Get raw kubeconfig from Terraform output
+  ansible.builtin.command: "terraform output -raw kubeconfig"
   args:
     chdir: "{{ terraform_dir }}"
-  register: talos_health_check
-  until: talos_health_check.rc == 0
-  retries: 60
-  delay: 10
+  register: raw_kubeconfig_output
   delegate_to: localhost
 
-- name: Verify all Talos nodes have joined the cluster
-  ansible.builtin.command: "talosctl --talosconfig={{ terraform_dir }}/talosconfig get members"
-  args:
-    chdir: "{{ terraform_dir }}"
-  register: talos_members_check
-  until: talos_members_check.stdout is search("Ready") and talos_members_check.stdout is search("controlplane") and talos_members_check.stdout is search("worker") # Basic check for controlplane and worker nodes
-  retries: 30
-  delay: 10
+- name: Save raw kubeconfig to file
+  ansible.builtin.copy:
+    content: "{{ raw_kubeconfig_output.stdout }}"
+    dest: "{{ terraform_dir }}/kubeconfig"
   delegate_to: localhost
 
 - name: Notify user that Talos cluster is provisioned and healthy
