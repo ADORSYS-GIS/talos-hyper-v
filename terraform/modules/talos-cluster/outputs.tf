@@ -5,7 +5,7 @@ output "kubeconfig" {
 }
 
 output "talosconfig" {
-  value       = talos_machine_secrets.this.client_configuration
-  sensitive   = true
+  value       = data.talos_client_configuration.this.talos_config
+  sensitive   = false
   description = "The generated talosconfig for the cluster."
 }
