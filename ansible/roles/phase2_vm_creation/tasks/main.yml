@@ -1,6 +1,16 @@
 ---
-- name: Execute terraform apply for hyperv-host module
-  ansible.builtin.command: "terraform apply -target=module.host1 -auto-approve -var-file=cluster.tfvars"
+- name: Read hyperv-host module names from hyperv_hosts.tf
+  ansible.builtin.set_fact:
+    hyperv_host_modules: "{{ lookup('file', terraform_dir + '/hyperv_hosts.tf') | regex_findall('module \"(hyperv-host.*?)\"', multiline=True) }}"
+  delegate_to: localhost
+
+- name: Construct terraform target arguments
+  ansible.builtin.set_fact:
+    terraform_targets: "{{ hyperv_host_modules | map('regex_replace', '^(.*)$', '-target=module.\\1') | join(' ') }}"
+  delegate_to: localhost
+
+- name: Execute terraform apply for all hyperv-host modules
+  ansible.builtin.command: "terraform apply {{ terraform_targets }} -auto-approve -var-file=cluster.tfvars"
   args:
     chdir: "{{ terraform_dir }}"
   register: tf_vm_creation_output

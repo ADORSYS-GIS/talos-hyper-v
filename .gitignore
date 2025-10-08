@@ -32,3 +32,4 @@ terraform.rc
 inventory.ini
 
 .secrets
+.roo
