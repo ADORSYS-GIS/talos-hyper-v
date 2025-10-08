@@ -38,7 +38,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
             physical: true
           addresses: [${each.value}/24]
           vip:
-            ip: ${var.talos_vip}/24
+            ip: ${var.talos_vip}
   EOT
   ] : []
 }

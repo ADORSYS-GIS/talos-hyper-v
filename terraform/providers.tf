@@ -23,7 +23,7 @@ provider "kubernetes" {
   client_certificate     = module.talos_cluster.kubernetes_client_configuration.client_certificate
   client_key             = module.talos_cluster.kubernetes_client_configuration.client_key
   cluster_ca_certificate = module.talos_cluster.kubernetes_client_configuration.ca_certificate
-  host                   = module.talos_cluster.kubernetes_client_configuration.host
+  host                   = "https://${var.talos_vip}:6443"
 }
 
 provider "helm" {
@@ -32,6 +32,6 @@ provider "helm" {
     client_certificate     = module.talos_cluster.kubernetes_client_configuration.client_certificate
     client_key             = module.talos_cluster.kubernetes_client_configuration.client_key
     cluster_ca_certificate = module.talos_cluster.kubernetes_client_configuration.ca_certificate
-    host                   = module.talos_cluster.kubernetes_client_configuration.host
+    host                   = "https://${var.talos_vip}:6443"
   }
 }
