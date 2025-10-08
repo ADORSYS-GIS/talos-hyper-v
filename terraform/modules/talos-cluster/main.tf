@@ -23,7 +23,7 @@ data "talos_client_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx + 1}" => ip }
+  for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx}" => ip }
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
@@ -38,13 +38,13 @@ for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx + 1}" =>
             physical: true
           addresses: [${each.value}/24]
           vip:
-            ip: ${var.talos_vip}
+            ip: ${var.talos_vip}/24
   EOT
   ] : []
 }
 
 resource "talos_machine_configuration_apply" "worker" {
-  for_each = { for idx, ip in var.worker_endpoints : "talos-wk${idx + 1}" => ip }
+  for_each = { for idx, ip in var.worker_endpoints : "talos-wk${idx}" => ip }
 
 
   client_configuration        = talos_machine_secrets.this.client_configuration
@@ -91,6 +91,6 @@ data "talos_cluster_health" "this" {
   worker_nodes         = var.worker_endpoints
 
   timeouts = {
-    read = "5m"
+    read = "15m"
   }
 }

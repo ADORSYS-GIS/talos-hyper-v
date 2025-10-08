@@ -23,3 +23,8 @@ module "talos_cluster" {
   depends_on = [local.host_modules]
 }
 
+module "longhorn" {
+  source = "./modules/longhorn"
+
+  depends_on = [module.talos_cluster]
+}
