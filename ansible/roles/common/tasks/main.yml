@@ -36,17 +36,13 @@
   become: true
   delegate_to: localhost
 
-- name: Set talosctl version
-  ansible.builtin.set_fact:
-    talosctl_version: '1.11.2'
-  delegate_to: localhost
-
-- name: Download talosctl
-  ansible.builtin.get_url:
-    url: 'https://factory.talos.dev/talosctl/v{{ talosctl_version }}/talosctl-linux-arm64'
-    dest: /usr/local/bin/talosctl
-    mode: '0755'
-    force: true
+- name: Install talosctl
+  ansible.builtin.shell:
+    cmd: >
+      curl -sL https://talos.dev/install | sh &&
+      mv talosctl /usr/local/bin/talosctl
+  args:
+    creates: /usr/local/bin/talosctl
   become: true
   delegate_to: localhost
 
