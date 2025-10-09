@@ -13,6 +13,7 @@ hyperv_hosts = {
 
 # Talos version
 talos_version = "v1.11.2"
+longhorn_version = "1.10.0"
 
 # iso path
 iso_path = "C:/Hyper-V/Isos/factory-metal-amd64.iso" # Update with the actual path to your Talos ISO

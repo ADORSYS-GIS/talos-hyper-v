@@ -24,7 +24,9 @@ module "talos_cluster" {
 }
 
 module "longhorn" {
-  source = "./modules/longhorn"
+  source           = "./modules/longhorn"
+  longhorn_version = var.longhorn_version
+  talos_vip        = var.talos_vip
 
   depends_on = [module.talos_cluster]
 }

@@ -16,7 +16,7 @@
 - name: Save raw kubeconfig to file
   ansible.builtin.copy:
     content: "{{ raw_kubeconfig_output.stdout }}"
-    dest: "{{ terraform_dir }}/kubeconfig"
+    dest: "{{ terraform_dir }}/_out/kubeconfig"
   delegate_to: localhost
 
 - name: Get raw talosconfig from Terraform output
@@ -29,7 +29,7 @@
 - name: Save raw talosconfig to file
   ansible.builtin.copy:
     content: "{{ raw_talosconfig_output.stdout }}"
-    dest: "{{ terraform_dir }}/talosconfig"
+    dest: "{{ terraform_dir }}/_out/talosconfig"
   delegate_to: localhost
 
 - name: Notify user that Talos cluster is provisioned and healthy

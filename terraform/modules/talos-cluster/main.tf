@@ -23,7 +23,7 @@ data "talos_client_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-  for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx}" => ip }
+  for_each = { for idx, ip in var.controlplane_endpoints : "talos-cp${idx + 1}" => ip }
 
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
@@ -44,7 +44,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
 }
 
 resource "talos_machine_configuration_apply" "worker" {
-  for_each = { for idx, ip in var.worker_endpoints : "talos-wk${idx}" => ip }
+  for_each = { for idx, ip in var.worker_endpoints : "talos-wk${idx + 1}" => ip }
 
 
   client_configuration        = talos_machine_secrets.this.client_configuration
@@ -54,6 +54,15 @@ resource "talos_machine_configuration_apply" "worker" {
   config_patches = var.talos_vip != "" ? [
     <<-EOT
   machine:
+    kubelet:
+      extraMounts:
+        - destination: /var/lib/longhorn
+          type: bind
+          source: /var/lib/longhorn
+          options:
+            - bind
+            - rshared
+            - rw
     network:
       hostname: ${each.key}
       interfaces:
@@ -87,10 +96,6 @@ data "talos_cluster_health" "this" {
 
   client_configuration = talos_machine_secrets.this.client_configuration
   control_plane_nodes  = var.controlplane_endpoints
-  endpoints            = [var.cluster_endpoint]
+  endpoints            = [var.talos_vip]
   worker_nodes         = var.worker_endpoints
-
-  timeouts = {
-    read = "15m"
-  }
 }

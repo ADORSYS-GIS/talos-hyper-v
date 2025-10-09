@@ -62,11 +62,8 @@ variable "talos_version" {
   default = "v1.11.2"
 }
 variable "talos_extensions" {
-  type = list(string)
-  default = [
-    "amdgpu",
-    "tailscale",
-  ]
+  type        = list(string)
+  default     = ["iscsi-tools"]
   description = "List of Talos extensions to install."
 }
 
@@ -84,4 +81,10 @@ variable "cluster_name" {
 variable "iso_path" {
   type        = string
   description = "Path to the Talos ISO image."
+}
+
+variable "longhorn_version" {
+  description = "Version of the Longhorn Helm chart to deploy."
+  type        = string
+  default     = "1.10.0"
 }

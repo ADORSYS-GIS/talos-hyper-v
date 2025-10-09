@@ -1,6 +1,6 @@
 output "iso_url" {
-  value       = data.talos_image_factory_urls.this.urls.iso
-  description = "The URL of the generated Talos ISO image."
+  value       = data.talos_image_factory_urls.this.urls.iso_secureboot
+  description = "The URL of the generated Talos secure boot ISO image."
 }
 
 output "schematic_id" {

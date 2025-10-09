@@ -20,18 +20,11 @@ terraform {
 }
 
 provider "kubernetes" {
-  client_certificate     = module.talos_cluster.kubernetes_client_configuration.client_certificate
-  client_key             = module.talos_cluster.kubernetes_client_configuration.client_key
-  cluster_ca_certificate = module.talos_cluster.kubernetes_client_configuration.ca_certificate
-  host                   = "https://${var.talos_vip}:6443"
+  config_path = "${path.module}/_out/kubeconfig"
 }
 
 provider "helm" {
-
   kubernetes {
-    client_certificate     = module.talos_cluster.kubernetes_client_configuration.client_certificate
-    client_key             = module.talos_cluster.kubernetes_client_configuration.client_key
-    cluster_ca_certificate = module.talos_cluster.kubernetes_client_configuration.ca_certificate
-    host                   = "https://${var.talos_vip}:6443"
+    config_path = "${path.module}/_out/kubeconfig"
   }
 }
