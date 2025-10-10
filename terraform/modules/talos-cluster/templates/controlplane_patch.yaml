@@ -1,0 +1,9 @@
+machine:
+  network:
+    hostname: ${each.key}
+    interfaces:
+      - deviceSelector:
+          physical: true
+        addresses: [${each.value}/24]
+        vip:
+          ip: ${talos_vip}

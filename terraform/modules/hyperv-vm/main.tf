@@ -5,10 +5,11 @@ locals {
     substr(md5(var.vm.name), 2, 2),
     substr(md5(var.vm.name), 4, 2)
   ))
+  disk_path = "${var.disk_dir_path}\\${var.vm.name}.vhdx"
 }
 
 resource "hyperv_vhd" "disk" {
-  path     = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
+  path     = local.disk_path
   size     = var.vm.disk_gb * 1024 * 1024 * 1024
   vhd_type = "Dynamic"
 }
@@ -41,7 +42,7 @@ resource "hyperv_machine_instance" "vm" {
   hard_disk_drives {
     controller_number   = 0
     controller_location = 0
-    path                = "C:/Hyper-V/VHDs/${var.vm.name}.vhdx"
+    path                = local.disk_path
   }
 
   vm_firmware {

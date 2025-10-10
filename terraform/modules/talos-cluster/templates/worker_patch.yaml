@@ -1,0 +1,16 @@
+machine:
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options:
+          - bind
+          - rshared
+          - rw
+  network:
+    hostname: ${each.key}
+    interfaces:
+      - deviceSelector:
+          physical: true
+        addresses: [${each.value}/24]

@@ -49,7 +49,7 @@ variable "switch" {
 
 variable "vhd_name" {
   type    = string
-  default = "webserver.vhdx"
+  default = "talos-vm.vhdx"
 }
 
 variable "vhd_size_gb" {
@@ -87,4 +87,10 @@ variable "longhorn_version" {
   description = "Version of the Longhorn Helm chart to deploy."
   type        = string
   default     = "1.10.0"
+}
+
+variable "disk_dir_path" {
+  type        = string
+  description = "Parent directory for all VMs disks"
+  default = "D:\\Hyper-V\\VHDs"
 }

@@ -19,6 +19,7 @@
   ansible.builtin.pip:
     name: pywinrm
     state: present
+    extra_args: --break-system-packages
   become: true
   delegate_to: localhost
 
@@ -38,9 +39,7 @@
 
 - name: Install talosctl
   ansible.builtin.shell:
-    cmd: >
-      curl -sL https://talos.dev/install | sh &&
-      mv talosctl /usr/local/bin/talosctl
+    cmd: curl -sL https://talos.dev/install | sh
   args:
     creates: /usr/local/bin/talosctl
   become: true

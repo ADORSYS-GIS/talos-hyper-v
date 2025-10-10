@@ -11,9 +11,17 @@ variable "vm" {
 }
 
 variable "iso_path" {
-  type = string
+  type        = string
+  description = "Path to the Talos ISO image."
 }
 
 variable "cluster_switch" {
-  type = string
+  type        = string
+  description = "External Switch all VMs should be connected to."
+}
+
+variable "disk_dir_path" {
+  type        = string
+  description = "Parent directory for all VMs disks"
+  default     = "D:\\Hyper-V\\VHDs"
 }

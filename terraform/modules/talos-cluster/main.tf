@@ -29,17 +29,11 @@ resource "talos_machine_configuration_apply" "controlplane" {
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
   node                        = each.value
   config_patches = var.talos_vip != "" ? [
-    <<-EOT
-  machine:
-    network:
-      hostname: ${each.key}
-      interfaces:
-        - deviceSelector:
-            physical: true
-          addresses: [${each.value}/24]
-          vip:
-            ip: ${var.talos_vip}
-  EOT
+    templatefile("${path.module}/templates/controlplane_patch.yaml", {
+      each_key = each.key
+      each_value = each.value
+      talos_vip = var.talos_vip
+    })
   ] : []
 }
 
@@ -52,24 +46,10 @@ resource "talos_machine_configuration_apply" "worker" {
   node                        = each.value
 
   config_patches = var.talos_vip != "" ? [
-    <<-EOT
-  machine:
-    kubelet:
-      extraMounts:
-        - destination: /var/lib/longhorn
-          type: bind
-          source: /var/lib/longhorn
-          options:
-            - bind
-            - rshared
-            - rw
-    network:
-      hostname: ${each.key}
-      interfaces:
-        - deviceSelector:
-            physical: true
-          addresses: [${each.value}/24]
-  EOT
+    templatefile("${path.module}/templates/worker_patch.yaml", {
+      each_key = each.key
+      each_value = each.value
+    })
   ] : []
 }
 
