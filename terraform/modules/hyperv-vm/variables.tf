@@ -7,6 +7,7 @@ variable "vm" {
     memory  = optional(number, 4096)
     cpus    = optional(number, 2)
     disk_gb = optional(number, 40)
+    storage_disk_gb = optional(number)
   })
 }
 

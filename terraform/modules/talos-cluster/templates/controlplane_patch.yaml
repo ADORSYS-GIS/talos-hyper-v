@@ -1,9 +1,9 @@
 machine:
   network:
-    hostname: ${each.key}
+    hostname: ${hostname}
     interfaces:
       - deviceSelector:
           physical: true
-        addresses: [${each.value}/24]
+        addresses: [${ip_addr}/24]
         vip:
           ip: ${talos_vip}

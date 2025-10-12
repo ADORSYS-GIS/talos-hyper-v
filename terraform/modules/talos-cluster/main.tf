@@ -30,8 +30,8 @@ resource "talos_machine_configuration_apply" "controlplane" {
   node                        = each.value
   config_patches = var.talos_vip != "" ? [
     templatefile("${path.module}/templates/controlplane_patch.yaml", {
-      each_key = each.key
-      each_value = each.value
+      hostname = each.key
+      ip_addr = each.value
       talos_vip = var.talos_vip
     })
   ] : []
@@ -47,8 +47,8 @@ resource "talos_machine_configuration_apply" "worker" {
 
   config_patches = var.talos_vip != "" ? [
     templatefile("${path.module}/templates/worker_patch.yaml", {
-      each_key = each.key
-      each_value = each.value
+      hostname = each.key
+      ip_addr = each.value
     })
   ] : []
 }

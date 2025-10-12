@@ -6,11 +6,19 @@ locals {
     substr(md5(var.vm.name), 4, 2)
   ))
   disk_path = "${var.disk_dir_path}\\${var.vm.name}.vhdx"
+  storage_disk_path = var.vm.storage_disk_gb != null ? "${var.disk_dir_path}\\${var.vm.name}-storage.vhdx" : null
 }
 
 resource "hyperv_vhd" "disk" {
   path     = local.disk_path
   size     = var.vm.disk_gb * 1024 * 1024 * 1024
+  vhd_type = "Dynamic"
+}
+
+resource "hyperv_vhd" "storage_disk" {
+  count    = var.vm.storage_disk_gb != null ? 1 : 0
+  path     = local.storage_disk_path
+  size     = var.vm.storage_disk_gb * 1024 * 1024 * 1024
   vhd_type = "Dynamic"
 }
 
@@ -21,7 +29,7 @@ resource "hyperv_machine_instance" "vm" {
   processor_count      = var.vm.cpus
   static_memory        = true # Assuming static memory for simplicity, can be made variable
 
-  depends_on = [hyperv_vhd.disk]
+  depends_on = [hyperv_vhd.disk, hyperv_vhd.storage_disk]
 
   lifecycle {
     ignore_changes = all
@@ -43,6 +51,15 @@ resource "hyperv_machine_instance" "vm" {
     controller_number   = 0
     controller_location = 0
     path                = local.disk_path
+  }
+
+  dynamic "hard_disk_drives" {
+    for_each = var.vm.storage_disk_gb != null ? [1] : []
+    content {
+      controller_number   = 0
+      controller_location = 2
+      path                = local.storage_disk_path
+    }
   }
 
   vm_firmware {
