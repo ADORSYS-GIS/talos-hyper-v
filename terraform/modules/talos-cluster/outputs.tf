@@ -4,10 +4,16 @@ output "kubeconfig" {
   description = "The generated kubeconfig for the cluster."
 }
 
-output "kubernetes_client_configuration" {
-  value       = talos_cluster_kubeconfig.this.kubernetes_client_configuration
+output "cluster_ca_certificate" {
+  value       = talos_machine_secrets.this.client_configuration.ca_certificate
   sensitive   = true
   description = "The client certificate from the generated kubeconfig."
+}
+
+output "cluster_token" {
+  value       = talos_machine_secrets.this.machine_secrets.trustdinfo.token
+  sensitive   = true
+  description = "The token from the generated kubeconfig."
 }
 
 

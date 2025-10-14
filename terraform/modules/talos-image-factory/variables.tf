@@ -5,6 +5,5 @@ variable "talos_version" {
 
 variable "talos_extensions" {
   type        = list(string)
-  default     = ["iscsi-tools"]
   description = "A list of Talos extensions to include in the image."
 }

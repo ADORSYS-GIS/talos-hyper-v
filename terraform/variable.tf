@@ -63,7 +63,7 @@ variable "talos_version" {
 }
 variable "talos_extensions" {
   type        = list(string)
-  default     = ["iscsi-tools"]
+  default     = ["iscsi-tools", "util-linux-tools"]
   description = "List of Talos extensions to install."
 }
 

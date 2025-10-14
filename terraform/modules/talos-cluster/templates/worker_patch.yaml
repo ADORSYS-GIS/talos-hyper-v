@@ -1,8 +1,11 @@
 machine:
+  type: worker
+  sysctls:
+    vm.nr_hugepages: "1024"
   kernel:
     modules:
-      - name: iscsi_tcp
-      - name: overlay
+      - name: nvme_tcp
+      - name: vfio_pci
   kubelet:
     extraMounts:
       - destination: /var/lib/longhorn
@@ -18,3 +21,6 @@ machine:
       - deviceSelector:
           physical: true
         addresses: [${ip_addr}/24]
+  install:
+    disk: /dev/vda
+    image: ${talos_installer}

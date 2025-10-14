@@ -29,3 +29,9 @@ variable "talos_vip" {
   description = "The virtual IP address for the Talos cluster."
   default     = ""
 }
+
+variable "talos_installer" {
+  type        = string
+  description = "The Talos installer image URL."
+  default     = "ghcr.io/siderolabs/installer:v1.11.2"
+}

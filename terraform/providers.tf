@@ -12,19 +12,14 @@ terraform {
       source  = "hashicorp/helm"
       version = "2.9.0"
     }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "2.23.0"
-    }
   }
 }
 
-provider "kubernetes" {
-  config_path = "${path.module}/_out/kubeconfig"
-}
-
 provider "helm" {
+  alias = "talos"
   kubernetes {
-    config_path = "${path.module}/_out/kubeconfig"
+    host                   = local.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.talos_cluster.cluster_ca_certificate)
+    token                  = module.talos_cluster.cluster_token
   }
 }
