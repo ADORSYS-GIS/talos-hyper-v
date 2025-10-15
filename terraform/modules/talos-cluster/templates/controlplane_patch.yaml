@@ -8,3 +8,20 @@ machine:
         addresses: [${ip_addr}/24]
         vip:
           ip: ${talos_vip}
+  time:
+    servers:
+      - ${ntp_server}
+  registries:
+    mirrors:
+      docker.io:
+        endpoints:
+          - ${registry_mirror_endpoint}
+      gcr.io:
+        endpoints:
+          - ${registry_mirror_endpoint}
+      ghcr.io:
+        endpoints:
+          - ${registry_mirror_endpoint}
+      registry.k8s.io:
+        endpoints:
+          - ${registry_mirror_endpoint}

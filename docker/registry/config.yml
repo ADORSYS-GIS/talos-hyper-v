@@ -1,0 +1,13 @@
+# ./registry/config.yml  (Distribution v3)
+version: 0.1
+log:
+  level: info
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: true            # allow deleting tags/blobs (GC behavior changed in v3, still useful)
+http:
+  addr: :5000
+  headers:
+    X-Content-Type-Options: [nosniff]

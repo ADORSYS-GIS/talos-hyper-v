@@ -92,5 +92,15 @@ variable "longhorn_version" {
 variable "disk_dir_path" {
   type        = string
   description = "Parent directory for all VMs disks"
-  default = "D:\\Hyper-V\\VHDs"
+  default     = "D:\\Hyper-V\\VHDs"
+}
+
+variable "ntp_server" {
+  type        = string
+  description = "Local NTP server"
+}
+
+variable "registry_mirror_endpoint" {
+  type        = string
+  description = "The local docker registry endpoint"
 }

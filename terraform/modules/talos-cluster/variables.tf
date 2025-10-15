@@ -35,3 +35,13 @@ variable "talos_installer" {
   description = "The Talos installer image URL."
   default     = "ghcr.io/siderolabs/installer:v1.11.2"
 }
+
+variable "ntp_server" {
+  type        = string
+  description = "Local NTP server"
+}
+
+variable "registry_mirror_endpoint" {
+  type        = string
+  description = "The local docker registry endpoint"
+}

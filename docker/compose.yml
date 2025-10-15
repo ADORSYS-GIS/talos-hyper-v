@@ -1,0 +1,39 @@
+networks:
+  infra: 
+    driver: bridge
+
+volumes:
+  ntp_state:
+  registry_data:
+
+services:
+  ntp:
+    image: cturra/ntp:latest
+    container_name: ntp
+    restart: unless-stopped
+    networks: [infra]
+    ports:
+      - "123:123/udp"      # NTP
+    environment:
+      - NTP_SERVERS=time.cloudflare.com,nts.netnod.se,ptbtime1.ptb.de
+      - ENABLE_NTS=true    # NTS to upstreams (client mode only; no local certs needed)
+      - TZ=Africa/Douala
+    volumes:
+      - ntp_state:/var/lib/chrony
+      - ./ntp/chrony.conf:/etc/chrony/chrony.conf
+    healthcheck:
+      test: ["CMD", "chronyc", "-a", "tracking"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  registry:
+    image: registry:3
+    container_name: registry
+    restart: unless-stopped
+    networks: [infra]
+    ports:
+      - "6000:5000"
+    volumes:
+      - registry_data:/var/lib/registry
+      - ./registry/config.yml:/etc/distribution/config.yml:ro

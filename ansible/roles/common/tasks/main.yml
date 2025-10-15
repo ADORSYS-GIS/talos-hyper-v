@@ -1,4 +1,16 @@
 ---
+- name: Install Docker prerequisites
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  become: true
+  delegate_to: localhost
+
 - name: Ensure 'unzip' is installed
   ansible.builtin.apt:
     name: unzip
@@ -57,5 +69,39 @@
     dest: /usr/local/bin
     remote_src: yes
     creates: /usr/local/bin/k9s
+  become: true
+  delegate_to: localhost
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: true
+  delegate_to: localhost
+
+- name: Add Docker APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  become: true
+  delegate_to: localhost
+
+- name: Install Docker Engine
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  become: true
+  delegate_to: localhost
+
+- name: Add current user to docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: true
   become: true
   delegate_to: localhost

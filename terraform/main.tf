@@ -14,13 +14,15 @@ module "talos_image_factory" {
 module "talos_cluster" {
   source = "./modules/talos-cluster"
 
-  cluster_name           = var.cluster_name
-  talos_version          = var.talos_version
-  controlplane_endpoints = [for vm in var.host_vms : vm.ip if vm.role == "controlplane"]
-  worker_endpoints       = [for vm in var.host_vms : vm.ip if vm.role == "worker"]
-  cluster_endpoint       = local.cluster_endpoint
-  talos_vip              = var.talos_vip
-  talos_installer        = module.talos_image_factory.talos_installer
+  cluster_name             = var.cluster_name
+  talos_version            = var.talos_version
+  controlplane_endpoints   = [for vm in var.host_vms : vm.ip if vm.role == "controlplane"]
+  worker_endpoints         = [for vm in var.host_vms : vm.ip if vm.role == "worker"]
+  cluster_endpoint         = local.cluster_endpoint
+  talos_vip                = var.talos_vip
+  talos_installer          = module.talos_image_factory.talos_installer
+  registry_mirror_endpoint = var.registry_mirror_endpoint
+  ntp_server               = var.ntp_server
 
   depends_on = [local.host_modules, module.talos_image_factory]
 }
