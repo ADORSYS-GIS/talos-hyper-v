@@ -52,7 +52,7 @@ resource "talos_machine_configuration_apply" "worker" {
     templatefile("${path.module}/templates/worker_patch.yaml", {
       hostname                 = each.key
       ip_addr                  = each.value
-      talos_installer          = var.talos_installer
+      talos_installer          = var.talos_installers[each.value]
       registry_mirror_endpoint = var.registry_mirror_endpoint
       ntp_server               = var.ntp_server
     })

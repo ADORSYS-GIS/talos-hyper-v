@@ -30,10 +30,9 @@ variable "talos_vip" {
   default     = ""
 }
 
-variable "talos_installer" {
-  type        = string
+variable "talos_installers" {
+  type        = map(string)
   description = "The Talos installer image URL."
-  default     = "ghcr.io/siderolabs/installer:v1.11.2"
 }
 
 variable "ntp_server" {

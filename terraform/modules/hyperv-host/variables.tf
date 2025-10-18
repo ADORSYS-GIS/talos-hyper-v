@@ -25,18 +25,12 @@ variable "vms" {
   description = "A list of VMs to create on this host."
 }
 
-variable "iso_path" {
-  type        = string
-  description = "Path to the Talos ISO image on the Hyper-V host."
+variable "iso_paths" {
+  type        = map(string)
+  description = "Path to the Talos ISO image on the Hyper-V host, by IP"
 }
 
 variable "cluster_switch" {
   type        = string
   description = "Name of the virtual switch to connect the VMs to."
-}
-
-variable "production" {
-  type        = bool
-  default     = false
-  description = "If true, enforce production checks (HTTPS required, cert thumbprint required)"
 }

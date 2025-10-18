@@ -25,12 +25,21 @@ output "talosconfig" {
   description = "The generated talosconfig for the cluster."
 }
 
-output "talos_iso_url" {
-  value       = module.talos_image_factory.iso_url
+output "talos_iso_urls" {
+  value       = module.talos_image_factory.iso_urls
   description = "The URL of the generated Talos ISO image."
 }
 
-output "talos_schematic_id" {
-  value       = module.talos_image_factory.schematic_id
+output "talos_iso_urls_download_commands_powershell" {
+  value = [
+    for k, v in module.talos_image_factory.iso_urls :
+    "Invoke-WebRequest ${v} -OutFile ${local.iso_name_suffix[k]}"
+  ]
+
+  description = "The URL of the generated Talos ISO image."
+}
+
+output "talos_schematic_ids" {
+  value       = module.talos_image_factory.schematic_ids
   description = "The ID of the generated Talos schematic."
 }

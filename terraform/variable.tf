@@ -19,7 +19,7 @@ variable "host_vms" {
     role     = string # "controlplane" or "worker"
     ip       = string # static IP to configure inside Talos
     mac      = optional(string)
-    memory   = optional(number, 4096)
+    memory   = optional(number, 8096)
     cpus     = optional(number, 2)
     disk_gb  = optional(number, 40)
     host_key = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
@@ -32,29 +32,9 @@ variable "talos_vip" {
   default     = ""
 }
 
-variable "vm_memory" {
-  type    = number
-  default = 4096
-}
-
-variable "vm_cpu" {
-  type    = number
-  default = 2
-}
-
 variable "switch" {
   type    = string
   default = "Default Switch"
-}
-
-variable "vhd_name" {
-  type    = string
-  default = "talos-vm.vhdx"
-}
-
-variable "vhd_size_gb" {
-  type    = number
-  default = 40
 }
 
 variable "talos_version" {
@@ -78,9 +58,9 @@ variable "cluster_name" {
   description = "The name of the Talos cluster."
 }
 
-variable "iso_path" {
+variable "iso_prefix_path" {
   type        = string
-  description = "Path to the Talos ISO image."
+  description = "Prefix path to the Talos ISO image."
 }
 
 variable "longhorn_version" {
@@ -89,15 +69,19 @@ variable "longhorn_version" {
   default     = "1.10.0"
 }
 
-variable "disk_dir_path" {
-  type        = string
-  description = "Parent directory for all VMs disks"
-  default     = "D:\\Hyper-V\\VHDs"
-}
-
 variable "ntp_server" {
   type        = string
   description = "Local NTP server"
+}
+
+variable "gateway_server" {
+  type        = string
+  description = "Gateway server"
+}
+
+variable "network_mask" {
+  type = string
+  default = "255.255.255.0"
 }
 
 variable "registry_mirror_endpoint" {

@@ -3,9 +3,10 @@ module "hyperv-host01" {
 
   host_config    = var.hyperv_hosts["host01"]
   vms            = local.vms_by_host["host01"]
-  iso_path       = var.iso_path
   cluster_switch = var.switch
-  production     = var.production
+  iso_paths = {
+    for k, s in local.iso_name_suffix : k => "${var.iso_prefix_path}/${s}"
+  }
 }
 
 locals {

@@ -1,14 +1,20 @@
-output "iso_url" {
-  value       = data.talos_image_factory_urls.this.urls.iso_secureboot
+output "iso_urls" {
+  value = {
+    for ip in var.machines_ips : ip => data.talos_image_factory_urls.this[ip].urls.iso_secureboot
+  }
   description = "The URL of the generated Talos secure boot ISO image."
 }
 
-output "schematic_id" {
-  value       = talos_image_factory_schematic.this.id
+output "schematic_ids" {
+  value = {
+    for ip in var.machines_ips : ip => talos_image_factory_schematic.this[ip].id
+  }
   description = "The ID of the generated Talos schematic."
 }
 
-output "talos_installer" {
-  value       = data.talos_image_factory_urls.this.urls.installer_secureboot
+output "talos_installers" {
+  value = {
+    for ip in var.machines_ips : ip => data.talos_image_factory_urls.this[ip].urls.installer_secureboot
+  }
   description = "The Talos installer image URL."
 }

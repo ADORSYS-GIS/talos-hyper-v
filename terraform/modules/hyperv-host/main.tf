@@ -7,7 +7,7 @@ module "vms" {
   }
 
   vm             = each.value
-  iso_path       = var.iso_path
+  iso_path       = var.iso_paths[each.value.ip]
   cluster_switch = var.cluster_switch
 }
 
