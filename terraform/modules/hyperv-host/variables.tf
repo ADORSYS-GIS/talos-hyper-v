@@ -17,9 +17,9 @@ variable "vms" {
     name                = string
     ip                  = string # static IP to configure inside Talos
     mac                 = optional(string)
-    memory              = optional(number, 4096)
-    cpus                = optional(number, 2)
-    disk_gb             = optional(number, 40)
+    memory              = optional(number)
+    cpus                = optional(number)
+    disk_gb             = optional(number, 50)
     storage_disk_sizes = optional(list(number), [])
     disk_dir_path       = optional(string)
   }))
