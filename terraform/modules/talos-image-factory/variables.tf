@@ -5,18 +5,18 @@ variable "talos_version" {
 
 variable "machines_configs" {
   type = map(object({
-    host_name   = string
-    mac_address = string
-    extensions  = list(string)
+    host_name        = string
+    easy_mac_address = string
+    extensions       = list(string)
   }))
 }
 
-variable "dns_01" { 
-  type = string 
+variable "dns_01" {
+  type = string
 }
 
-variable "dns_02" { 
-  type = string 
+variable "dns_02" {
+  type = string
 }
 
 variable "ntp_ip" {

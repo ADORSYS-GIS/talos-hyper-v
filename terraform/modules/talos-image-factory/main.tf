@@ -16,7 +16,7 @@ resource "talos_image_factory_schematic" "this" {
           officialExtensions = data.talos_image_factory_extensions_versions.this[each.key].extensions_info.*.name,
         }
         extraKernelArgs = [
-          "ip=${each.key}::${var.gw_ip}:${var.network_mask}:${each.value.host_name}:enx${each.value.mac_address}::${var.dns_01}:${var.dns_02}:${var.ntp_ip}"
+          "ip=${each.key}::${var.gw_ip}:${var.network_mask}:${each.value.host_name}:enx${each.value.easy_mac_address}::${var.dns_01}:${var.dns_02}:${var.ntp_ip}"
         ]
       }
     }

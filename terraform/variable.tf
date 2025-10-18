@@ -19,8 +19,8 @@ variable "host_vms" {
     role       = string # "controlplane" or "worker"
     ip         = string # static IP to configure inside Talos
     mac        = optional(string)
-    memory     = optional(number, 8096)
-    cpus       = optional(number, 2)
+    memory     = optional(number)
+    cpus       = optional(number)
     disk_gb    = optional(number, 40)
     host_key   = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
     extensions = optional(list(string))
