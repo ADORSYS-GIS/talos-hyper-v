@@ -1,14 +1,29 @@
-variable "vm" {
-  type = object({
-    name    = string
-    role    = string
-    ip      = string
-    mac     = optional(string)
-    memory  = optional(number, 4096)
-    cpus    = optional(number, 2)
-    disk_gb = optional(number, 40)
-    storage_disk_gb = optional(number)
-  })
+variable "name" { 
+  type = string 
+}
+
+variable "mac" { 
+  type = string 
+}
+
+variable "memory" { 
+  type = number
+  default = 4096 
+}
+
+variable "cpus" { 
+  type = number
+  default = 2 
+}
+
+variable "disk_gb" { 
+  type = number
+  default = 50 
+}
+
+variable "storage_disk_gb" { 
+  type = number 
+  default = null
 }
 
 variable "iso_path" {

@@ -1,21 +1,21 @@
-locals {
-  vms_by_host = {
-    for vm in var.host_vms : vm.host_key => vm...
-  }
-  iso_name_suffix = {
-    for vm in var.host_vms : vm.ip => "talos-${vm.ip}.iso"
-  }
-  cluster_endpoint = "https://${var.talos_vip}:6443"
-}
 module "talos_image_factory" {
   source = "./modules/talos-image-factory"
 
-  ntp_ip           = var.ntp_server
-  talos_version    = var.talos_version
-  talos_extensions = var.talos_extensions
-  gw_ip            = var.gateway_server
-  network_mask     = var.network_mask
-  machines_ips     = [for vm in var.host_vms : vm.ip]
+  ntp_ip        = var.ntp_server
+  talos_version = var.talos_version
+  gw_ip         = var.gateway_server
+  network_mask  = var.network_mask
+
+  machines_configs = {
+    for vm in var.host_vms : vm.ip => {
+      host_name   = vm.name
+      mac_address = try(coalesce(vm.mac, null), local.vms_macs[vm.ip])
+      extensions  = try(coalesce(vm.extensions, null), default_talos_extensions)
+    }
+  }
+
+  dns_01 = var.default_dns_01
+  dns_02 = var.default_dns_02
 }
 
 module "talos_cluster" {

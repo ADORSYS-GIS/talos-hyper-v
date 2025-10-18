@@ -13,16 +13,29 @@ variable "host_config" {
 }
 
 variable "vms" {
-  type = list(object({
-    name    = string
-    role    = string # "controlplane" or "worker"
-    ip      = string # static IP to configure inside Talos
-    mac     = optional(string)
-    memory  = optional(number, 4096)
-    cpus    = optional(number, 2)
-    disk_gb = optional(number, 40)
+  type = map(object({
+    name            = string
+    ip              = string # static IP to configure inside Talos
+    mac             = optional(string)
+    memory          = optional(number, 4096)
+    cpus            = optional(number, 2)
+    disk_gb         = optional(number, 40)
+    storage_disk_gb = optional(number)
+    disk_dir_path   = optional(string)
   }))
   description = "A list of VMs to create on this host."
+}
+
+variable "vms_macs" {
+  type = map(string)
+}
+
+variable "default_memory" {
+  type = number
+}
+
+variable "default_disk_dir_path" {
+  type = string
 }
 
 variable "iso_paths" {

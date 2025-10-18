@@ -15,14 +15,15 @@ variable "hyperv_hosts" {
 
 variable "host_vms" {
   type = list(object({
-    name     = string
-    role     = string # "controlplane" or "worker"
-    ip       = string # static IP to configure inside Talos
-    mac      = optional(string)
-    memory   = optional(number, 8096)
-    cpus     = optional(number, 2)
-    disk_gb  = optional(number, 40)
-    host_key = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
+    name       = string
+    role       = string # "controlplane" or "worker"
+    ip         = string # static IP to configure inside Talos
+    mac        = optional(string)
+    memory     = optional(number, 8096)
+    cpus       = optional(number, 2)
+    disk_gb    = optional(number, 40)
+    host_key   = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
+    extensions = optional(list(string))
   }))
 }
 
@@ -40,17 +41,6 @@ variable "switch" {
 variable "talos_version" {
   type    = string
   default = "v1.11.2"
-}
-variable "talos_extensions" {
-  type        = list(string)
-  default     = ["iscsi-tools", "util-linux-tools"]
-  description = "List of Talos extensions to install."
-}
-
-variable "production" {
-  type        = bool
-  default     = false
-  description = "If true, enforce production checks (HTTPS required, cert thumbprint required)"
 }
 
 variable "cluster_name" {
@@ -80,11 +70,37 @@ variable "gateway_server" {
 }
 
 variable "network_mask" {
-  type = string
+  type    = string
   default = "255.255.255.0"
 }
 
 variable "registry_mirror_endpoint" {
   type        = string
   description = "The local docker registry endpoint"
+}
+
+variable "default_memory" {
+  type = number
+  default = 16384
+}
+
+variable "disk_dir_path" {
+  type = string
+  default = null
+}
+
+variable "default_talos_extensions" {
+  type        = list(string)
+  default     = ["iscsi-tools", "util-linux-tools"]
+  description = "List of Talos extensions to install."
+}
+
+variable "default_dns_01" {
+  type = string
+  default = "1.1.1.1"
+}
+
+variable "default_dns_02" {
+  type = string
+  default = "8.8.8.8"
 }

@@ -3,13 +3,20 @@ variable "talos_version" {
   description = "The version of Talos to use."
 }
 
-variable "talos_extensions" {
-  type        = list(string)
-  description = "A list of Talos extensions to include in the image."
+variable "machines_configs" {
+  type = map(object({
+    host_name   = string
+    mac_address = string
+    extensions  = string
+  }))
 }
 
-variable "machines_ips" {
-  type = list(string)
+variable "dns_01" { 
+  type = string 
+}
+
+variable "dns_02" { 
+  type = string 
 }
 
 variable "ntp_ip" {
