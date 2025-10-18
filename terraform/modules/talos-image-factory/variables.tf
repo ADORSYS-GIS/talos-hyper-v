@@ -7,7 +7,7 @@ variable "machines_configs" {
   type = map(object({
     host_name   = string
     mac_address = string
-    extensions  = string
+    extensions  = list(string)
   }))
 }
 
