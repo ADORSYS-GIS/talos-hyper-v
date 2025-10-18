@@ -36,6 +36,7 @@ variable "default_memory" {
 
 variable "default_disk_dir_path" {
   type = string
+  default = null
 }
 
 variable "iso_paths" {

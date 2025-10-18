@@ -10,7 +10,7 @@ module "talos_image_factory" {
     for vm in var.host_vms : vm.ip => {
       host_name   = vm.name
       mac_address = try(coalesce(vm.mac, null), local.vms_macs[vm.ip])
-      extensions  = try(coalesce(vm.extensions, null), default_talos_extensions)
+      extensions  = try(coalesce(vm.extensions, null), var.default_talos_extensions)
     }
   }
 
