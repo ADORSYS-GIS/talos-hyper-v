@@ -1,28 +1,31 @@
-variable "name" { 
-  type = string 
+variable "name" {
+  type = string
 }
 
-variable "mac" { 
-  type = string 
+variable "mac" {
+  type = string
 }
 
-variable "memory" { 
-  type = number
-  default = 4096 
+variable "memory" {
+  type    = number
+  default = 4096
 }
 
-variable "cpus" { 
-  type = number
-  default = 2 
+variable "cpus" {
+  type    = number
+  default = 2
 }
 
-variable "disk_gb" { 
-  type = number
-  default = 50 
+variable "disk_gb" {
+  type    = number
+  default = 50
 }
 
-variable "storage_disk_gb" { 
-  type = number 
+variable "storage_disk_label_sizes" {
+  type = map(object({
+    size     = number
+    location = number
+  }))
   default = null
 }
 

@@ -15,15 +15,16 @@ variable "hyperv_hosts" {
 
 variable "host_vms" {
   type = list(object({
-    name       = string
-    role       = string # "controlplane" or "worker"
-    ip         = string # static IP to configure inside Talos
-    mac        = optional(string)
-    memory     = optional(number)
-    cpus       = optional(number)
-    disk_gb    = optional(number, 40)
-    host_key   = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
-    extensions = optional(list(string))
+    name                     = string
+    role                     = string # "controlplane" or "worker"
+    ip                       = string # static IP to configure inside Talos
+    mac                      = optional(string)
+    memory                   = optional(number)
+    cpus                     = optional(number)
+    disk_gb                  = optional(number, 40)
+    storage_disk_label_sizes = optional(list(number), [])
+    host_key                 = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
+    extensions               = optional(list(string))
   }))
 }
 
@@ -80,17 +81,17 @@ variable "registry_mirror_endpoint" {
 }
 
 variable "default_memory" {
-  type = number
+  type    = number
   default = 4096
 }
 
 variable "default_cpus" {
-  type = number
+  type    = number
   default = 2
 }
 
 variable "disk_dir_path" {
-  type = string
+  type    = string
   default = null
 }
 
@@ -101,11 +102,11 @@ variable "default_talos_extensions" {
 }
 
 variable "default_dns_01" {
-  type = string
+  type    = string
   default = "1.1.1.1"
 }
 
 variable "default_dns_02" {
-  type = string
+  type    = string
   default = "8.8.8.8"
 }
