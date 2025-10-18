@@ -21,7 +21,7 @@ variable "disk_gb" {
   default = 50
 }
 
-variable "storage_disk_label_sizes" {
+variable "storage_disk_sizes" {
   type = map(object({
     size     = number
     location = number

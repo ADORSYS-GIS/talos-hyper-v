@@ -10,7 +10,7 @@ locals {
   vms_by_host = {
     for vm in var.host_vms : vm.host_key => vm...
   }
-  
+
   iso_name_suffix = {
     for vm in var.host_vms : vm.ip => "talos-${vm.ip}.iso"
   }

@@ -11,10 +11,10 @@ module "vms" {
   memory  = try(coalesce(each.value.memory, var.default_memory))
   cpus    = try(coalesce(each.value.cpus, var.default_cpus))
   disk_gb = each.value.disk_gb
-  storage_disk_label_sizes = {
-    for idx in range(2, 2 + length(each.value.storage_disk_label_sizes)) :
+  storage_disk_sizes = {
+    for idx in range(2, 2 + length(each.value.storage_disk_sizes)) :
     "storage-disk-${idx}" => {
-      size     = each.value.storage_disk_label_sizes[idx]
+      size     = each.value.storage_disk_sizes[idx]
       location = idx
     }
   }

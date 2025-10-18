@@ -14,14 +14,14 @@ variable "host_config" {
 
 variable "vms" {
   type = map(object({
-    name                     = string
-    ip                       = string # static IP to configure inside Talos
-    mac                      = optional(string)
-    memory                   = optional(number, 4096)
-    cpus                     = optional(number, 2)
-    disk_gb                  = optional(number, 40)
-    storage_disk_label_sizes = optional(list(number), [])
-    disk_dir_path            = optional(string)
+    name                = string
+    ip                  = string # static IP to configure inside Talos
+    mac                 = optional(string)
+    memory              = optional(number, 4096)
+    cpus                = optional(number, 2)
+    disk_gb             = optional(number, 40)
+    storage_disk_sizes = optional(list(number), [])
+    disk_dir_path       = optional(string)
   }))
   description = "A list of VMs to create on this host."
 }

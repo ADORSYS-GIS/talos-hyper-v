@@ -1,5 +1,5 @@
 locals {
-  disk_path         = "${var.disk_dir_path}\\${var.name}.vhdx"
+  disk_path = "${var.disk_dir_path}\\${var.name}.vhdx"
 }
 
 resource "hyperv_vhd" "disk" {
@@ -9,7 +9,7 @@ resource "hyperv_vhd" "disk" {
 }
 
 resource "hyperv_vhd" "storage_disk" {
-  for_each = var.storage_disk_label_sizes
+  for_each = var.storage_disk_sizes
   path     = "${var.disk_dir_path}\\${var.name}-${each.key}-storage.vhdx"
   size     = each.value.size * 1024 * 1024 * 1024
   vhd_type = "Dynamic"
@@ -47,7 +47,7 @@ resource "hyperv_machine_instance" "vm" {
   }
 
   dynamic "hard_disk_drives" {
-    for_each = var.storage_disk_label_sizes
+    for_each = var.storage_disk_sizes
     content {
       controller_number   = 0
       controller_location = hard_disk_drives.value.location
