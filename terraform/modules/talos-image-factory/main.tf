@@ -6,7 +6,7 @@ data "talos_image_factory_extensions_versions" "this" {
 }
 
 resource "talos_image_factory_schematic" "this" {
-  count = length(var.machines_ips)
+  for_each = {for ip in var.machines_ips: ip => ip}
 
   schematic = yamlencode(
     {
@@ -15,7 +15,7 @@ resource "talos_image_factory_schematic" "this" {
           officialExtensions = data.talos_image_factory_extensions_versions.this.extensions_info.*.name,
         }
         extraKernelArgs = [
-          "ip=${var.machines_ips[count.index]}::${var.gw_ip}:${var.network_mask}::::::${var.ntp_ip}"
+          "ip=${each.value}::${var.gw_ip}:${var.network_mask}::::::${var.ntp_ip}"
         ]
       }
     }
@@ -23,9 +23,9 @@ resource "talos_image_factory_schematic" "this" {
 }
 
 data "talos_image_factory_urls" "this" {
-  count = length(var.machines_ips)
+  for_each = talos_image_factory_schematic.this
 
   talos_version = var.talos_version
-  schematic_id  = talos_image_factory_schematic.this[count.index].id
+  schematic_id  = each.value.id
   platform      = "metal"
 }
