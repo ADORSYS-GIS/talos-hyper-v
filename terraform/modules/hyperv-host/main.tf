@@ -9,7 +9,7 @@ module "vms" {
   name            = try(coalesce(each.value.name, var.default_memory))
   mac             = try(coalesce(each.value.mac, var.vms_macs[each.value.ip]))
   memory          = try(coalesce(each.value.memory, var.default_memory))
-  cpus            = each.value.cpus
+  cpus            = try(coalesce(each.value.cpus, var.default_cpus))
   disk_gb         = each.value.disk_gb
   storage_disk_gb = each.value.storage_disk_gb
   iso_path        = var.iso_paths[each.value.ip]

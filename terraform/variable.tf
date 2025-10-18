@@ -81,7 +81,12 @@ variable "registry_mirror_endpoint" {
 
 variable "default_memory" {
   type = number
-  default = 16384
+  default = 4096
+}
+
+variable "default_cpus" {
+  type = number
+  default = 2
 }
 
 variable "disk_dir_path" {

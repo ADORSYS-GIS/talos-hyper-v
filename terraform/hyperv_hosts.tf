@@ -4,6 +4,7 @@ module "hyperv-host01" {
   host_config           = var.hyperv_hosts["host01"]
   cluster_switch        = var.switch
   vms_macs              = local.vms_macs
+  default_cpus          = var.default_cpus
   default_memory        = var.default_memory
   default_disk_dir_path = var.disk_dir_path
   vms                   = { for vm in local.vms_by_host["host01"] : vm.name => vm }

@@ -34,6 +34,10 @@ variable "default_memory" {
   type = number
 }
 
+variable "default_cpus" {
+  type = number
+}
+
 variable "default_disk_dir_path" {
   type = string
   default = null
