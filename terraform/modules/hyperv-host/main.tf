@@ -13,7 +13,7 @@ module "vms" {
   disk_gb = each.value.disk_gb
   storage_disk_sizes = {
     for idx in range(2, 2 + length(each.value.storage_disk_sizes)) :
-    "storage-disk-${idx}" => {
+    "storage-disk-${idx - 2}" => {
       size     = each.value.storage_disk_sizes[idx - 2]
       location = idx
     }
