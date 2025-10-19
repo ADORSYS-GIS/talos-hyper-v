@@ -21,26 +21,11 @@ terraform {
 
 provider "helm" {
   kubernetes {
-    host                   = local.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.talos_cluster.cluster_ca_certificate)
-    token                  = module.talos_cluster.cluster_token
+    config_path = "~/.kube/config"
   }
 }
 
 provider "kubernetes" {
-  host                   = data.talos_machine_configuration.this.cluster_endpoint
-  cluster_ca_certificate = base64decode(data.talos_client_configuration.this.client_configuration.ca_certificate)
-  token                  = data.talos_machine_configuration.this.machine_secrets.trustdinfo.token
+  config_path = "~/.kube/config"
 }
 
-data "talos_client_configuration" "this" {
-  cluster_name         = var.cluster_name
-  client_configuration = module.talos_cluster.client_configuration
-}
-
-data "talos_machine_configuration" "this" {
-  cluster_name     = var.cluster_name
-  machine_type     = "controlplane"
-  cluster_endpoint = local.cluster_endpoint
-  machine_secrets  = module.talos_cluster.machine_secrets
-}
