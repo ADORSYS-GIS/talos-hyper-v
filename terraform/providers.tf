@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -21,4 +25,10 @@ provider "helm" {
     cluster_ca_certificate = base64decode(module.talos_cluster.cluster_ca_certificate)
     token                  = module.talos_cluster.cluster_token
   }
+}
+
+provider "kubernetes" {
+  host                   = local.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.talos_cluster.cluster_ca_certificate)
+  token                  = module.talos_cluster.cluster_token
 }
