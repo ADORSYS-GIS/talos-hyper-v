@@ -3,8 +3,10 @@ resource "helm_release" "longhorn" {
   repository       = "https://charts.longhorn.io"
   chart            = "longhorn"
   namespace        = "longhorn-system"
-  create_namespace = true
+  create_namespace = false
   version          = var.longhorn_version
+
+  depends_on = [kubernetes_namespace.longhorn_system]
 }
 
 resource "kubernetes_namespace" "longhorn_system" {
