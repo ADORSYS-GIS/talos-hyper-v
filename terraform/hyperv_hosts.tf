@@ -9,7 +9,7 @@ module "hyperv-host01" {
   default_disk_dir_path = var.disk_dir_path
   vms                   = { for vm in local.vms_by_host["host01"] : vm.name => vm }
   iso_paths = {
-    for k, s in local.iso_name_suffix : k => "${var.iso_prefix_path}/${s}"
+    for k, s in local.iso_name_suffix : k => "${var.iso_prefix_path}\\${s}"
   }
 }
 
