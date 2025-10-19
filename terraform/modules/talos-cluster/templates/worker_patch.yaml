@@ -41,3 +41,14 @@ machine:
       registry.k8s.io:
         endpoints:
           - ${registry_mirror_endpoint}
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn           # becomes /var/mnt/longhorn on the host
+provisioning:
+  minSize: 1GiB
+  diskSelector:
+    match: disk.dev_path == "/dev/sdb"
+  grow: true             # use 100 % of the disk
+filesystem:
+  type: xfs
