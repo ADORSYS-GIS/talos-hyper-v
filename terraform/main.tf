@@ -30,6 +30,7 @@ module "talos_cluster" {
   talos_installers         = module.talos_image_factory.talos_installers
   registry_mirror_endpoint = var.registry_mirror_endpoint
   ntp_server               = var.ntp_server
+  ip_range                 = var.ip_range
 
   depends_on = [local.host_modules, module.talos_image_factory]
 }

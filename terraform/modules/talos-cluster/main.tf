@@ -33,6 +33,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
       hostname                 = each.key
       ip_addr                  = each.value
       talos_vip                = var.talos_vip
+      ip_range                 = var.ip_range
       registry_mirror_endpoint = var.registry_mirror_endpoint
       ntp_server               = var.ntp_server
 

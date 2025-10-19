@@ -25,3 +25,30 @@ machine:
       registry.k8s.io:
         endpoints:
           - ${registry_mirror_endpoint}
+
+cluster:
+  extraManifests:
+    - https://raw.githubusercontent.com/metallb/metallb/v0.15.2/config/manifests/metallb-native.yaml
+  inlineManifests:
+    - name: metal-ci # Name of the manifest.
+      contents: |- # Manifest contents as a string.
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: kube-system
+          namespace: metallb-system
+        spec:
+          addresses:
+            - ${ip_range}
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: kube-system
+          namespace: metallb-system
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: BGPAdvertisement
+        metadata:
+          name: kube-system
+          namespace: metallb-system            

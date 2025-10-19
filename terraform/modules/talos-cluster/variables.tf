@@ -30,6 +30,10 @@ variable "talos_vip" {
   default     = ""
 }
 
+variable "ip_range" {
+  type = string
+}
+
 variable "talos_installers" {
   type        = map(string)
   description = "The Talos installer image URL."

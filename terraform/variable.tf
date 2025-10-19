@@ -109,3 +109,7 @@ variable "default_dns_02" {
   type    = string
   default = "8.8.8.8"
 }
+
+variable "ip_range" {
+  type = string
+}
