@@ -15,7 +15,7 @@ locals {
     for vm in var.host_vms : vm.ip => "talos-${vm.ip}.iso"
   }
 
-  first_cp_ip = toset([for vm in var.host_vms : vm.ip if vm.role == "controlplane"])
+  first_cp_ip = one(toset([for vm in var.host_vms : vm.ip if vm.role == "controlplane"]))
 
-  cluster_endpoint = "https://${local.first_cp_ip[0]}:6443"
+  cluster_endpoint = "https://${local.first_cp_ip}:6443"
 }
