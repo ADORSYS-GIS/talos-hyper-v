@@ -28,7 +28,7 @@ provider "helm" {
 }
 
 provider "kubernetes" {
-  host                   = data.talos_machine_configuration.this.cluster_name
+  host                   = data.talos_machine_configuration.this.cluster_endpoint
   cluster_ca_certificate = base64decode(data.talos_client_configuration.this.client_configuration.ca_certificate)
   token                  = data.talos_machine_configuration.this.machine_secrets.trustdinfo.token
 }
