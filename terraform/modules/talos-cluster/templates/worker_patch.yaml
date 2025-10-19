@@ -8,9 +8,9 @@ machine:
       - name: vfio_pci
   kubelet:
     extraMounts:
-      - destination: /var/lib/longhorn
+      - destination: /var/mnt/longhorn
         type: bind
-        source: /var/lib/longhorn
+        source: /var/mnt/longhorn
         options:
           - bind
           - rshared
@@ -44,11 +44,11 @@ machine:
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: longhorn           # becomes /var/mnt/longhorn on the host
+name: longhorn # becomes /var/mnt/longhorn on the host
 provisioning:
   minSize: 1GiB
   diskSelector:
     match: disk.dev_path == "/dev/sdb"
-  grow: true             # use 100 % of the disk
+  grow: true # use 100 % of the disk
 filesystem:
   type: xfs
