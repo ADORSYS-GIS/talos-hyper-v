@@ -31,7 +31,6 @@ variable "host_vms" {
 variable "talos_vip" {
   type        = string
   description = "The virtual IP address for the Talos cluster."
-  default     = ""
 }
 
 variable "switch" {

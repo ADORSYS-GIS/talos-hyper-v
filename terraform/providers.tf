@@ -10,13 +10,12 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.9.0"
+      version = "~> 2.0"
     }
   }
 }
 
 provider "helm" {
-  alias = "talos"
   kubernetes {
     host                   = local.cluster_endpoint
     cluster_ca_certificate = base64decode(module.talos_cluster.cluster_ca_certificate)
