@@ -43,9 +43,24 @@ variable "talos_version" {
   default = "v1.11.2"
 }
 
+variable "root_secret_name" {
+  description = "Name of the Kubernetes Secret that stores the root CA."
+  type        = string
+  default     = "wazuh-root-ca"
+}
+
 variable "cluster_name" {
   type        = string
   description = "The name of the Talos cluster."
+}
+
+variable "subject" {
+  type = object({
+    country      = string
+    locality     = string
+    organization = string
+    common_name  = string
+  })
 }
 
 variable "iso_prefix_path" {

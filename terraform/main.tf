@@ -41,3 +41,13 @@ module "longhorn" {
 
   depends_on = [module.talos_cluster]
 }
+
+module "wazuh" {
+  source = "./modules/wazuh"
+
+  root_secret_name = var.root_secret_name
+  output_folder    = "wazuh-certs-${var.cluster_name}"
+  subject          = var.subject
+
+  depends_on = [module.longhorn]
+}
