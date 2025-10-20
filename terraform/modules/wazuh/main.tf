@@ -56,7 +56,7 @@ resource "local_file" "root_ca_key_pem" {
 resource "kubernetes_secret" "wazuh_root_ca" {
   metadata {
     name      = var.root_secret_name
-    namespace = kubernetes_namespace.longhorn_system.metadata.name[0]
+    namespace = kubernetes_namespace.longhorn_system.metadata[0].name
   }
 
   type = "Opaque"
