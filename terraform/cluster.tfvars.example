@@ -1,13 +1,13 @@
-
 hyperv_hosts = {
   "host1" = {
-    host     = "100.116.65.14"
-    user     = ""
-    password = ""
-    port     = 5985
-    https    = false
-    insecure = true
-    use_ntlm = false
+    host            = "100.116.65.14"
+    user            = ""
+    password        = ""
+    port            = 5985
+    https           = false
+    insecure        = true
+    use_ntlm        = true # Updated to match default in variable.tf
+    cert_thumbprint = ""   # Added to match variable.tf
   }
 }
 
@@ -16,14 +16,13 @@ talos_version = "v1.11.2"
 longhorn_version = "1.10.0"
 
 # iso path
-iso_path = "C:/Hyper-V/Isos/factory-metal-amd64.iso" # Update with the actual path to your Talos ISO
-
+iso_prefix_path = "C:/Hyper-V/Isos/factory-metal-amd64.iso" # Renamed from iso_path to match variable.tf
 
 # VM definitions per host
 host_vms = [
-  { name = "talos-cp1", role = "controlplane", host_key = "host1", ip = "192.168.1.201", memory = 8192 },
-  { name = "talos-wk1", role = "worker", host_key = "host1", ip = "192.168.1.202" },
-  { name = "talos-wk2", role = "worker", host_key = "host1", ip = "192.168.1.203" }
+  { name = "talos-cp1", role = "controlplane", host_key = "host1", ip = "192.168.1.201", memory = 8192, cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
+  { name = "talos-wk1", role = "worker", host_key = "host1", ip = "192.168.1.202", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
+  { name = "talos-wk2", role = "worker", host_key = "host1", ip = "192.168.1.203", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] }
 ]
 
 # Shared cluster settings
@@ -37,3 +36,27 @@ registry_mirror_endpoint="http://172.0.0.1:5000"
 
 # ntp server
 ntp_server="0.pool.ntp.org"
+
+# New variables from terraform/variable.tf
+root_secret_name = "wazuh-root-ca"
+
+subject = {
+  country      = "CM"
+  locality     = "Douala"
+  organization = "BVMAC"
+  common_name  = "talos-cluster"
+}
+
+gateway_server = "192.168.1.1" # Example gateway server IP
+network_mask = "255.255.255.0"
+
+default_memory = 4096
+default_cpus = 2
+disk_dir_path = null
+
+default_talos_extensions = ["iscsi-tools", "util-linux-tools"]
+
+default_dns_01 = "1.1.1.1"
+default_dns_02 = "8.8.8.8"
+
+ip_range = "192.168.1.0/24" # Example IP range
