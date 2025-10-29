@@ -59,5 +59,8 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Create tfvars file
+        run: cp terraform/cluster.tfvars.example terraform/cluster.tfvars
+
       - name: Terraform Plan
-        run: terraform plan -var-file="terraform/cluster.tfvars.example"
+        run: terraform plan -var-file="terraform/cluster.tfvars"
