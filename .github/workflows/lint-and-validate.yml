@@ -48,19 +48,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Ansible
+        run: pip install ansible-lint ansible
+    
+      - name: Run Ansible Playbook
+        run: make init
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.x
 
-      - name: Run Ansible Playbook
-        run: make init
-
       - name: Terraform Init
         run: terraform init
-
-      - name: Create tfvars file
-        run: cp terraform/cluster.tfvars.example terraform/cluster.tfvars
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -var-file="terraform/cluster.tfvars"
+        working-directory: terraform 
