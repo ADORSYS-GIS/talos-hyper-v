@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Lint and Validate Infrastructure Code
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
       - name: Docker Lint (hadolint)
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: docker/compose.yml # Assuming compose.yml is the main Docker file, or specify individual Dockerfiles
+          dockerfile: docker/compose.yml
 
       - name: Fail if Terraform fmt or validate failed
         if: steps.fmt.outcome == 'failure' || steps.validate.outcome == 'failure'

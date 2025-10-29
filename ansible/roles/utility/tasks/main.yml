@@ -7,6 +7,7 @@
       - curl
       - gnupg
       - lsb-release
+      - make
     state: present
   become: true
   delegate_to: localhost
@@ -54,6 +55,17 @@
     cmd: curl -sL https://talos.dev/install | sh
   args:
     creates: /usr/local/bin/talosctl
+  become: true
+  delegate_to: localhost
+
+- name: Install kubectl
+  ansible.builtin.shell:
+    cmd: |
+      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      mv ./kubectl /usr/local/bin/kubectl
+    args:
+      creates: /usr/local/bin/kubectl
   become: true
   delegate_to: localhost
 

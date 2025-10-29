@@ -42,7 +42,10 @@ graph LR
         ansible -- provision --> terraform
     end
     
+    ExternalSwitch((External Switch))
+
     subgraph Hyper-V-Host-1
+        ExternalSwitch
         VM1(Control Plane 1)
         VM2(Worker 1)
     end
@@ -51,8 +54,6 @@ graph LR
         VM4(Control Plane 3)
         VM5(Worker 2)
     end
-    
-    ExternalSwitch((External Switch))
     
     VM1 -- Connected to --> ExternalSwitch
     VM2 -- Connected to --> ExternalSwitch
@@ -74,4 +75,5 @@ graph LR
 
     terraform sc@== Longhorn (Storage Class) ==> TalosCluster
     terraform lb@== MetalLB (LoadBalancer) ==> TalosCluster
-    terraform lb@== Wazuh certs ==> TalosCluster
+    terraform ca@== Wazuh certs ==> TalosCluster
+```
