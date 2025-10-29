@@ -5,7 +5,7 @@ resource "helm_release" "longhorn" {
   namespace        = "longhorn-system"
   create_namespace = false
   version          = var.longhorn_version
-  
+
   set {
     name  = "service.ui.type"
     value = "LoadBalancer"

@@ -15,16 +15,16 @@ variable "hyperv_hosts" {
 
 variable "host_vms" {
   type = list(object({
-    name                = string
-    role                = string # "controlplane" or "worker"
-    ip                  = string # static IP to configure inside Talos
-    mac                 = optional(string)
-    memory              = optional(number)
-    cpus                = optional(number)
-    disk_gb             = optional(number, 40)
+    name               = string
+    role               = string # "controlplane" or "worker"
+    ip                 = string # static IP to configure inside Talos
+    mac                = optional(string)
+    memory             = optional(number)
+    cpus               = optional(number)
+    disk_gb            = optional(number, 40)
     storage_disk_sizes = optional(list(number), [])
-    host_key            = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
-    extensions          = optional(list(string))
+    host_key           = optional(string) # the key (host map key) to indicate which hyperv host to create on - handled in root module mapping
+    extensions         = optional(list(string))
   }))
 }
 

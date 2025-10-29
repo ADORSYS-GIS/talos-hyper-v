@@ -38,47 +38,60 @@
 
 - name: Set Terraform version
   ansible.builtin.set_fact:
-    terraform_version: '1.7.5'
+    utility_terraform_version: '1.7.5'
   delegate_to: localhost
 
 - name: Download Terraform
   ansible.builtin.unarchive:
-    src: 'https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip'
+    src: 'https://releases.hashicorp.com/terraform/{{ utility_terraform_version }}/terraform_{{ utility_terraform_version }}_linux_amd64.zip'
     dest: /usr/local/bin
-    remote_src: yes
+    remote_src: true
     creates: /usr/local/bin/terraform
   become: true
   delegate_to: localhost
 
 - name: Install talosctl
-  ansible.builtin.shell:
-    cmd: curl -sL https://talos.dev/install | sh
+  ansible.builtin.get_url:
+    url: https://talos.dev/install
+    dest: /tmp/talos_install.sh
+    mode: '0755'
+  become: true
+  delegate_to: localhost
+
+- name: Execute talosctl install script
+  ansible.builtin.command:
+    cmd: /tmp/talos_install.sh
   args:
     creates: /usr/local/bin/talosctl
   become: true
   delegate_to: localhost
 
-- name: Install kubectl
-  ansible.builtin.shell:
-    cmd: |
-      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-      chmod +x ./kubectl
-      mv ./kubectl /usr/local/bin/kubectl
-    args:
-      creates: /usr/local/bin/kubectl
+- name: Get kubectl stable version
+  ansible.builtin.uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: true
+  register: utility_kubectl_version
+  delegate_to: localhost
+
+- name: Download kubectl
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ utility_kubectl_version.content | trim }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
   become: true
   delegate_to: localhost
+  changed_when: false
 
 - name: Set k9s version
   ansible.builtin.set_fact:
-    k9s_version: '0.28.2'
+    utility_k9s_version: '0.28.2'
   delegate_to: localhost
 
 - name: Download k9s
   ansible.builtin.unarchive:
-    src: 'https://github.com/derailed/k9s/releases/download/v{{ k9s_version }}/k9s_Linux_amd64.tar.gz'
+    src: 'https://github.com/derailed/k9s/releases/download/v{{ utility_k9s_version }}/k9s_Linux_amd64.tar.gz'
     dest: /usr/local/bin
-    remote_src: yes
+    remote_src: true
     creates: /usr/local/bin/k9s
   become: true
   delegate_to: localhost

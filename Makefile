@@ -1,8 +1,16 @@
 TERRAFORM_DIR := $(CURDIR)/terraform
 
-.PHONY: all init pre-provisioning talos-iso-acquisition vms-provisioning talos-provisioning longhorn-deployment wazuh-certs clean
+.PHONY: all init pre-provisioning talos-iso-acquisition vms-provisioning talos-provisioning longhorn-deployment wazuh-certs clean lint
 
 all: init pre-provisioning talos-iso-acquisition vms-provisioning talos-provisioning longhorn-deployment wazuh-certs
+
+lint:
+	@echo "Running Terraform format check..."
+	terraform fmt -check -recursive
+	@echo "Running Terraform validation..."
+	terraform validate
+	@echo "Running Ansible lint..."
+	ansible-lint ansible/playbook.yml
 
 init:
 	@echo "Checking for required tools..."
