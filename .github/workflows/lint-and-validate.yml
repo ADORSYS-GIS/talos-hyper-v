@@ -64,5 +64,5 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan -var-file="terraform/cluster.tfvars"
+        run: terraform plan -var-file="terraform/cluster.tfvars.example"
         working-directory: terraform 
