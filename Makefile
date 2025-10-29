@@ -15,11 +15,11 @@ lint:
 init:
 	@echo "Checking for required tools..."
 	@MISSING_TOOLS=""; \
-	command -v terraform >/dev/null 2>&1 || MISSING_TOOLS+="terraform "; \
-	command -v talosctl >/dev/null 2>&1 || MISSING_TOOLS+="talosctl "; \
-	command -v jq >/dev/null 2>&1 || MISSING_TOOLS+="jq "; \
-	command -v k9s >/dev/null 2>&1 || MISSING_TOOLS+="k9s "; \
-	command -v kubectl >/dev/null 2>&1 || MISSING_TOOLS+="kubectl "; \
+	command -v terraform >/dev/null 2>&1 || MISSING_TOOLS="$${MISSING_TOOLS}terraform "; \
+	command -v talosctl >/dev/null 2>&1 || MISSING_TOOLS="$${MISSING_TOOLS}talosctl "; \
+	command -v jq >/dev/null 2>&1 || MISSING_TOOLS="$${MISSING_TOOLS}jq "; \
+	command -v k9s >/dev/null 2>&1 || MISSING_TOOLS="$${MISSING_TOOLS}k9s "; \
+	command -v kubectl >/dev/null 2>&1 || MISSING_TOOLS="$${MISSING_TOOLS}kubectl "; \
 	if [ -n "$$MISSING_TOOLS" ]; then \
 		echo "Missing tools: $$MISSING_TOOLS. Running Ansible playbook to install them..."; \
 		ansible-playbook ansible/playbook.yml -K; \
