@@ -23,7 +23,7 @@ The diagram should also illustrate the flow of traffic between the components, s
 ## Proposed Diagram
 
 ```mermaid
-graph LR
+flowchart LR
     kubectl@{ shape: tag-rect, label: "kubectl" }
     k9s@{ shape: tag-rect, label: "k9s" } 
     talosctl@{ shape: tag-rect, label: "talosctl" }
@@ -68,13 +68,13 @@ graph LR
         Hyper-V-Host-2
     end
     
-    terraform -- Talos ISO (talos-192.168.1.201.iso) --> VM1
-    terraform -- Talos ISO (talos-192.168.1.202.iso) --> VM2
-    terraform -- Talos ISO (talos-192.168.1.203.iso) --> VM3
-    terraform -- Talos ISO (talos-192.168.1.204.iso) --> VM4
-    terraform -- Talos ISO (talos-192.168.1.205.iso) --> VM5
+    terraform -- talos-192.168.1.201.iso --> VM1
+    terraform -- talos-192.168.1.202.iso --> VM2
+    terraform -- talos-192.168.1.203.iso --> VM3
+    terraform -- talos-192.168.1.204.iso --> VM4
+    terraform -- talos-192.168.1.205.iso --> VM5
 
 
-    terraform workload@== Longhorn (Storage Class) ==> TalosCluster
-    terraform workload@== MetalLB (LoadBalancer) ==> TalosCluster
-    terraform workload@== Wazuh certs ==> TalosCluster
+    terraform == Initial workload StorageClass(Longhorn) ==> TalosCluster
+    terraform == Initial workload LoadBalancer(MetalLB) ==> TalosCluster
+    terraform == Initial workload RootCA(wazuh-certs) ==> TalosCluster
