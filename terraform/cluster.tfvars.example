@@ -1,5 +1,5 @@
 hyperv_hosts = {
-  "host1" = {
+  "host01" = {
     host            = "100.116.65.14"
     user            = ""
     password        = ""
@@ -20,9 +20,9 @@ iso_prefix_path = "C:/Hyper-V/Isos/factory-metal-amd64.iso" # Renamed from iso_p
 
 # VM definitions per host
 host_vms = [
-  { name = "talos-cp1", role = "controlplane", host_key = "host1", ip = "192.168.1.201", memory = 8192, cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
-  { name = "talos-wk1", role = "worker", host_key = "host1", ip = "192.168.1.202", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
-  { name = "talos-wk2", role = "worker", host_key = "host1", ip = "192.168.1.203", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] }
+  { name = "talos-cp1", role = "controlplane", host_key = "host01", ip = "192.168.1.201", memory = 8192, cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
+  { name = "talos-wk1", role = "worker", host_key = "host01", ip = "192.168.1.202", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] },
+  { name = "talos-wk2", role = "worker", host_key = "host01", ip = "192.168.1.203", cpus = 2, disk_gb = 40, extensions = ["iscsi-tools", "util-linux-tools"] }
 ]
 
 # Shared cluster settings
