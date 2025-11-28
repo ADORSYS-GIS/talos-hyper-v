@@ -38,6 +38,8 @@ module "talos_cluster" {
 module "longhorn" {
   source           = "./modules/longhorn"
   longhorn_version = var.longhorn_version
+  longhorn_trim_groups = var.longhorn_trim_groups
+  trim_cron_schedule   = var.trim_cron_schedule
 
   depends_on = [module.talos_cluster]
 }
