@@ -12,7 +12,7 @@ variable "longhorn_trim_groups" {
 variable "trim_cron_schedule" {
   description = "The Cron expression for the trim job schedule (e.g., '0 2 * * *' for daily at 2 AM)."
   type        = string
-  
+
   validation {
     # CRITICAL: Validate the string has 5 or 6 fields separated by spaces.
     condition     = can(regex("^(?:\\S+\\s){4}\\S+(?:\\s\\S+)?$", var.trim_cron_schedule))
