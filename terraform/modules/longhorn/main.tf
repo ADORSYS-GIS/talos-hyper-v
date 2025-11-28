@@ -34,8 +34,8 @@ resource "kubernetes_manifest" "longhorn_filesystem_trim_daily" {
 
   manifest = {
     apiVersion = "longhorn.io/v1beta1"
-    kind        = "RecurringJob"
-    
+    kind       = "RecurringJob"
+
 
     metadata = {
       name      = "filesystem-trim-job"
@@ -43,12 +43,13 @@ resource "kubernetes_manifest" "longhorn_filesystem_trim_daily" {
     }
 
     spec = {
-      task = "trim"
+      task = "filesystem-trim"
 
       # Use the user-defined Cron schedule variable
       cron = var.trim_cron_schedule
 
       concurrency = 1
+      retain      = 0
 
       groups = var.longhorn_trim_groups
     }
