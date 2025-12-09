@@ -18,3 +18,21 @@ variable "subject" {
     common_name  = string
   })
 }
+
+variable "helm_release_name" {
+  description = "Name of the Helm release for Wazuh."
+  type        = string
+  default     = "wazuh"
+}
+
+variable "helm_chart_version" {
+  description = "Version of the Wazuh Helm chart."
+  type        = string
+  default     = "0.6.1-rc.11"
+}
+
+variable "helm_values" {
+  description = "YAML values to pass to the Wazuh Helm chart."
+  type        = string
+  default     = ""
+}

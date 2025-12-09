@@ -1,11 +1,6 @@
-resource "kubernetes_namespace" "longhorn_system" {
+resource "kubernetes_namespace" "wazuh" {
   metadata {
     name = "wazuh"
-    labels = {
-      "pod-security.kubernetes.io/enforce" = "privileged"
-      "pod-security.kubernetes.io/audit"   = "privileged"
-      "pod-security.kubernetes.io/warn"    = "privileged"
-    }
   }
 }
 
@@ -56,7 +51,7 @@ resource "local_file" "root_ca_key_pem" {
 resource "kubernetes_secret" "wazuh_root_ca" {
   metadata {
     name      = var.root_secret_name
-    namespace = kubernetes_namespace.longhorn_system.metadata[0].name
+    namespace = kubernetes_namespace.wazuh.metadata[0].name
   }
 
   type = "Opaque"
@@ -67,6 +62,13 @@ resource "kubernetes_secret" "wazuh_root_ca" {
   }
 
   depends_on = [
-    kubernetes_namespace.longhorn_system
+    kubernetes_namespace.wazuh
   ]
+}
+
+module "wazuh_helm" {
+  source        = "../wazuh_helm"
+  release_name  = var.helm_release_name
+  chart_version = var.helm_chart_version
+  namespace     = kubernetes_namespace.wazuh.metadata[0].name
 }

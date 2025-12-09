@@ -1,0 +1,63 @@
+svcs:
+  '{{ include "common.names.fullname" $ }}':
+    loadBalancerIP: ${lb_ips.manager}
+  '{{ include "common.names.fullname" $ }}-worker':
+    loadBalancerIP: ${lb_ips.worker}
+  '{{ include "common.names.fullname" $ }}-dashboard':
+    loadBalancerIP: ${lb_ips.dashboard}
+  '{{ include "common.names.fullname" $ }}-cluster':
+    loadBalancerIP: ${lb_ips.cluster}
+  '{{ include "common.names.fullname" $ }}-single-cluster':
+    enabled: true
+    type: LoadBalancer
+    selector:
+      app: '{{ include "common.names.fullname" $ }}-manager'
+    ports:
+      - name: agents-events
+        port: 1514
+        protocol: TCP
+        targetPort: agents-events
+      - name: registration
+        port: 1515
+        protocol: TCP
+        targetPort: registration
+
+cluster:
+  rootCaSecretName: root-ca-certs
+
+indexer:
+  persistence:
+    size: 50Gi
+
+master:
+  persistence:
+    size: 50Gi
+
+worker:
+  persistence:
+    size: 50Gi
+
+dashboard:
+  branding:
+    logo:
+      defaultUrl: ${dashboard_branding.logo_default_url}
+    mark:
+      defaultUrl: ${dashboard_branding.mark_default_url}
+    loadingLogo:
+      defaultUrl: ${dashboard_branding.loading_logo_default_url}
+    faviconUrl: ${dashboard_branding.favicon_url}
+    applicationTitle: "${dashboard_branding.application_title}"
+    useExpandedHeader: false
+
+integration:
+  azure: ~
+  aws:
+    enabled: false
+  jira:
+    enabled: true
+    webhookUrl: ${jira_webhook_url}
+    externalSecret: ~
+
+  teams:
+    enabled: true
+    webhookUrl: ${teams_webhook_url}
