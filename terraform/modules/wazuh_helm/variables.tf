@@ -7,19 +7,13 @@ variable "release_name" {
 variable "chart_version" {
   description = "Version of the Wazuh Helm chart."
   type        = string
-  default     = "0.6.1-rc.11"
+  default     = "0.1.0"
 }
 
 variable "namespace" {
   description = "Kubernetes namespace to deploy Wazuh into."
   type        = string
   default     = "wazuh"
-}
-
-variable "helm_values_lb" {
-  description = "YAML values to pass to the Helm chart for load balancer configuration."
-  type        = string
-  default     = "{}"
 }
 
 variable "helm_values_load_balancer_ips" {
@@ -80,22 +74,4 @@ variable "helm_values_dashboard_branding_application_title" {
   description = "Application title for the dashboard branding."
   type        = string
   default     = "Wazuh | BVMAC"
-}
-
-variable "helm_values_longhorn" {
-  description = "YAML values to pass to the Helm chart for Longhorn integration."
-  type        = string
-  default     = "{}"
-}
-
-variable "helm_values_permission_fix" {
-  description = "YAML values to pass to the Helm chart for permission fixes."
-  type        = string
-  default     = "{}"
-}
-
-variable "helm_values_tmp" {
-  description = "Additional external YAML values to pass to the Helm chart."
-  type        = string
-  default     = "{}"
 }

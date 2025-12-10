@@ -21,6 +21,5 @@ resource "helm_release" "wazuh" {
     }),
     file("${path.module}/templates/values-longhorn.yaml"),
     file("${path.module}/templates/values-permission.fix.yaml"),
-    var.helm_values_tmp
   ]
 }
