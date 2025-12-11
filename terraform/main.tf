@@ -45,9 +45,12 @@ module "longhorn" {
 module "wazuh" {
   source = "./modules/wazuh"
 
-  root_secret_name = var.root_secret_name
-  output_folder    = "wazuh-certs-${var.cluster_name}"
-  subject          = var.subject
+  root_secret_name           = var.root_secret_name
+  output_folder              = "wazuh-certs-${var.cluster_name}"
+  subject                    = var.subject
+  helm_release_name          = var.wazuh_helm_release_name
+  helm_chart_version         = var.wazuh_helm_chart_version
+  master_enrollment_password = var.master_enrollment_password
 
   depends_on = [module.longhorn]
 }

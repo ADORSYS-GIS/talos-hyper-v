@@ -1,19 +1,16 @@
 variable "release_name" {
   description = "Name of the Helm release."
   type        = string
-  default     = "wazuh"
 }
 
 variable "chart_version" {
   description = "Version of the Wazuh Helm chart."
   type        = string
-  default     = "0.1.0"
 }
 
 variable "namespace" {
   description = "Kubernetes namespace to deploy Wazuh into."
   type        = string
-  default     = "wazuh"
 }
 
 variable "helm_values_load_balancer_ips" {
@@ -74,4 +71,14 @@ variable "helm_values_dashboard_branding_application_title" {
   description = "Application title for the dashboard branding."
   type        = string
   default     = "Wazuh | BVMAC"
+}
+
+variable "root_secret_name" {
+  description = "Name of the Kubernetes Secret that stores the root CA."
+  type        = string
+}
+
+variable "master_enrollment_password" {
+  description = "Enrollment password for the Wazuh master node."
+  type        = string
 }

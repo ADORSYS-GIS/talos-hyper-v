@@ -128,3 +128,21 @@ variable "default_dns_02" {
 variable "ip_range" {
   type = string
 }
+
+variable "wazuh_helm_release_name" {
+  description = "Name of the Helm release for Wazuh."
+  type        = string
+  default     = "wazuh-helm"
+}
+
+variable "wazuh_helm_chart_version" {
+  description = "Version of the Wazuh Helm chart."
+  type        = string
+  default     = "0.6.1-rc.11"
+}
+
+variable "master_enrollment_password" {
+  description = "Enrollment password for the Wazuh manager master node."
+  type        = string
+  default     = "j60B6_e`jmQ_3z!z"
+}

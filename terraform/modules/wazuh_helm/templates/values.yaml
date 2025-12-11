@@ -23,17 +23,29 @@ svcs:
         targetPort: registration
 
 cluster:
-  rootCaSecretName: root-ca-certs
-
-indexer:
-  persistence:
-    size: 50Gi
+  rootCaSecretName: ${root_ca_secret_name}
 
 master:
+  replicaCount: 1
+  resources: ~
   persistence:
     size: 50Gi
-
-worker:
+  auth:
+    enrollment:
+      method: "password"
+      password: ${master_enrollment_password}
+  
+worker: 
+  replicaCount: 1
+  resources: ~
+  persistence:
+    size: 50Gi
+  
+indexer: 
+  replicas: 1
+  resources: ~
+  keycloak: 
+    enabled: false
   persistence:
     size: 50Gi
 

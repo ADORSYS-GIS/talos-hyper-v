@@ -1,7 +1,13 @@
 resource "kubernetes_namespace" "wazuh" {
   metadata {
     name = "wazuh"
+    labels = {
+      "pod-security.kubernetes.io/enforce" = "privileged"
+      "pod-security.kubernetes.io/audit"   = "privileged"
+      "pod-security.kubernetes.io/warn"    = "privileged"
+    }
   }
+
 }
 
 # --- Root CA key ---
@@ -67,8 +73,12 @@ resource "kubernetes_secret" "wazuh_root_ca" {
 }
 
 module "wazuh_helm" {
-  source        = "../wazuh_helm"
-  release_name  = var.helm_release_name
-  chart_version = var.helm_chart_version
-  namespace     = kubernetes_namespace.wazuh.metadata[0].name
+  source                     = "../wazuh_helm"
+  release_name               = var.helm_release_name
+  chart_version              = var.helm_chart_version
+  namespace                  = kubernetes_namespace.wazuh.metadata[0].name
+  root_secret_name           = var.root_secret_name
+  master_enrollment_password = var.master_enrollment_password
+
+  depends_on = [kubernetes_secret.wazuh_root_ca]
 }
