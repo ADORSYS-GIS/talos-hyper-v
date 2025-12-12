@@ -48,6 +48,9 @@ indexer:
     enabled: false
   persistence:
     size: 50Gi
+    auth:
+      username: ${indexer_auth.username}
+      password: ${indexer_auth.password}
 
 dashboard:
   branding:

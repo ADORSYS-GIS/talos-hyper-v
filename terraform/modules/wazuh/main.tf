@@ -74,11 +74,13 @@ resource "kubernetes_secret" "wazuh_root_ca" {
 
 module "wazuh_helm" {
   source                     = "../wazuh_helm"
-  release_name               = var.helm_release_name
-  chart_version              = var.helm_chart_version
+  release_name               = var.wazuh_helm_config.helm_release_name
+  chart_version              = var.wazuh_helm_config.helm_chart_version
   namespace                  = kubernetes_namespace.wazuh.metadata[0].name
   root_secret_name           = var.root_secret_name
-  master_enrollment_password = var.master_enrollment_password
+  master_enrollment_password = var.wazuh_helm_config.master_enrollment_password
+  indexer_auth_username      = var.wazuh_helm_config.indexer_auth_username
+  indexer_auth_password      = var.wazuh_helm_config.indexer_auth_password
 
   depends_on = [kubernetes_secret.wazuh_root_ca]
 }

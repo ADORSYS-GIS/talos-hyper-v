@@ -19,17 +19,14 @@ variable "subject" {
   })
 }
 
-variable "helm_release_name" {
-  description = "Name of the Helm release for Wazuh."
-  type        = string
-}
-
-variable "helm_chart_version" {
-  description = "Version of the Wazuh Helm chart."
-  type        = string
-}
-
-variable "master_enrollment_password" {
-  description = "Enrollment password for the Wazuh manager master node."
-  type        = string
+variable "wazuh_helm_config" {
+  description = "Configuration for the Wazuh deployment."
+  type = object({
+    helm_release_name          = string
+    helm_chart_version         = string
+    master_enrollment_password = string
+    indexer_auth_username      = string
+    indexer_auth_password      = string
+  })
+  sensitive = true
 }

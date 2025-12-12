@@ -13,6 +13,10 @@ resource "helm_release" "wazuh" {
       teams_webhook_url          = var.helm_values_teams_webhook_url,
       root_ca_secret_name        = var.root_secret_name,
       master_enrollment_password = var.master_enrollment_password,
+      indexer_auth = {
+        username = var.indexer_auth_username,
+        password = var.indexer_auth_password,
+      },
       dashboard_branding = {
         logo_default_url         = var.helm_values_dashboard_branding_logo_default_url,
         mark_default_url         = var.helm_values_dashboard_branding_mark_default_url,

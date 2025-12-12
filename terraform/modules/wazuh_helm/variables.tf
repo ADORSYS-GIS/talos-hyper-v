@@ -82,3 +82,13 @@ variable "master_enrollment_password" {
   description = "Enrollment password for the Wazuh master node."
   type        = string
 }
+
+variable "indexer_auth_username" {
+  description = "Username for the Wazuh indexer authentication."
+  type        = string
+}
+
+variable "indexer_auth_password" {
+  description = "Password for the Wazuh indexer authentication."
+  type        = string
+}
