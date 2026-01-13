@@ -128,3 +128,8 @@ variable "default_dns_02" {
 variable "ip_range" {
   type = string
 }
+
+variable "kubernetes_version" {
+  type        = string
+  description = "The version of Kubernetes to use."
+}

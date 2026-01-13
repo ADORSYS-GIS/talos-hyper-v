@@ -31,6 +31,7 @@ module "talos_cluster" {
   registry_mirror_endpoint = var.registry_mirror_endpoint
   ntp_server               = var.ntp_server
   ip_range                 = var.ip_range
+  kubernetes_version       = var.kubernetes_version
 
   depends_on = [local.host_modules, module.talos_image_factory]
 }

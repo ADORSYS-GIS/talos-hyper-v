@@ -48,3 +48,8 @@ variable "registry_mirror_endpoint" {
   type        = string
   description = "The local docker registry endpoint"
 }
+
+variable "kubernetes_version" {
+  type        = string
+  description = "The version of Kubernetes to use."
+}
