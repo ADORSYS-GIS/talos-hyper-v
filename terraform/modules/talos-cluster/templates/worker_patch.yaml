@@ -22,7 +22,7 @@ machine:
           physical: true
         addresses: [${ip_addr}/24]
   install:
-    disk: /dev/vda
+    disk: /dev/sda
     image: ${talos_installer}
   time:
     servers:
