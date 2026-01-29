@@ -5,7 +5,7 @@ metadata:
   namespace: litmus
   labels:
     infra_id: 55eed248-6688-484d-8e6c-77f49ae59ca5
-    revision_id: 016c4347-6a1a-4d18-abef-c8ce7ea3265c
+    revision_id: 9c855833-b61b-4475-a8b0-feaf1d44dd45
     workflow_id: 8552d46e-3401-4c48-bbeb-a9e526653303
     workflows.argoproj.io/controller-instanceid: 55eed248-6688-484d-8e6c-77f49ae59ca5
 spec:
@@ -21,16 +21,16 @@ spec:
         - - name: pod-delete
             template: pod-delete
             arguments: {}
-        - - name: pod-cpu-hog
+          - name: pod-cpu-hog
             template: pod-cpu-hog
             arguments: {}
-        - - name: pod-memory-hog
+          - name: pod-memory-hog
             template: pod-memory-hog
             arguments: {}
-        - - name: pod-network-loss
+          - name: pod-network-loss
             template: pod-network-loss
             arguments: {}
-        - - name: pod-io-stress
+          - name: pod-io-stress
             template: pod-io-stress
             arguments: {}
         - - name: cleanup-chaos-resources
@@ -48,13 +48,127 @@ spec:
                 metadata:
                   name: pod-delete
                   namespace: litmus
+                  labels:
+                    name: pod-delete
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: chaosexperiment
+                    app.kubernetes.io/version: 3.24.0
                 spec:
                   definition:
                     scope: Namespaced
+                    labels:
+                      name: pod-delete
+                      app.kubernetes.io/part-of: litmus
+                      app.kubernetes.io/component: experiment-job
+
                     permissions:
-                      - apiGroups: [""]
-                        resources: ["pods"]
-                        verbs: ["get", "list", "delete"]
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods
+                        verbs:
+                          - create
+                          - delete
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - deletecollection
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - events
+                        verbs:
+                          - create
+                          - get
+                          - list
+                          - patch
+                          - update
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - configmaps
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/log
+                        verbs:
+                          - get
+                          - list
+                          - watch
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/exec
+                        verbs:
+                          - get
+                          - list
+                          - create
+                      - apiGroups:
+                          - apps
+                        resources:
+                          - deployments
+                          - statefulsets
+                          - replicasets
+                          - daemonsets
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - apps.openshift.io
+                        resources:
+                          - deploymentconfigs
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - replicationcontrollers
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - argoproj.io
+                        resources:
+                          - rollouts
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - batch
+                        resources:
+                          - jobs
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - delete
+                          - deletecollection
+                      - apiGroups:
+                          - litmuschaos.io
+                        resources:
+                          - chaosengines
+                          - chaosexperiments
+                          - chaosresults
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - patch
+                          - update
+                          - delete
+                    image: docker.io/litmuschaos/go-runner:3.24.0
+                    imagePullPolicy: Always
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - ./experiments -name pod-delete
+
                     env:
                       - name: TOTAL_CHAOS_DURATION
                         value: "30"
@@ -71,13 +185,127 @@ spec:
                 metadata:
                   name: pod-cpu-hog
                   namespace: litmus
+                  labels:
+                    name: pod-cpu-hog
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: chaosexperiment
+                    app.kubernetes.io/version: 3.24.0
                 spec:
                   definition:
                     scope: Namespaced
+                    labels:
+                      name: pod-cpu-hog
+                      app.kubernetes.io/part-of: litmus
+                      app.kubernetes.io/component: experiment-job
+
                     permissions:
-                      - apiGroups: [""]
-                        resources: ["pods"]
-                        verbs: ["get", "list", "delete"]
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods
+                        verbs:
+                          - create
+                          - delete
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - deletecollection
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - events
+                        verbs:
+                          - create
+                          - get
+                          - list
+                          - patch
+                          - update
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - configmaps
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/log
+                        verbs:
+                          - get
+                          - list
+                          - watch
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/exec
+                        verbs:
+                          - get
+                          - list
+                          - create
+                      - apiGroups:
+                          - apps
+                        resources:
+                          - deployments
+                          - statefulsets
+                          - replicasets
+                          - daemonsets
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - apps.openshift.io
+                        resources:
+                          - deploymentconfigs
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - replicationcontrollers
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - argoproj.io
+                        resources:
+                          - rollouts
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - batch
+                        resources:
+                          - jobs
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - delete
+                          - deletecollection
+                      - apiGroups:
+                          - litmuschaos.io
+                        resources:
+                          - chaosengines
+                          - chaosexperiments
+                          - chaosresults
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - patch
+                          - update
+                          - delete
+                    image: docker.io/litmuschaos/go-runner:3.24.0
+                    imagePullPolicy: Always
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - ./experiments -name pod-cpu-hog
+
                     env:
                       - name: TOTAL_CHAOS_DURATION
                         value: "60"
@@ -85,6 +313,8 @@ spec:
                         value: "1"
                       - name: CHAOS_KILL_COMMAND
                         value: "kill -9"
+                      - name: PODS_AFFECTED_PERC
+                        value: "50"
           - name: pod-memory-hog
             path: /tmp/chaosengine-pod-memory-hog.yaml
             raw:
@@ -94,18 +324,134 @@ spec:
                 metadata:
                   name: pod-memory-hog
                   namespace: litmus
+                  labels:
+                    name: pod-memory-hog
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: chaosexperiment
+                    app.kubernetes.io/version: 3.24.0
                 spec:
                   definition:
                     scope: Namespaced
+                    labels:
+                      name: pod-memory-hog
+                      app.kubernetes.io/part-of: litmus
+                      app.kubernetes.io/component: experiment-job
+
                     permissions:
-                      - apiGroups: [""]
-                        resources: ["pods"]
-                        verbs: ["get", "list", "delete"]
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods
+                        verbs:
+                          - create
+                          - delete
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - deletecollection
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - events
+                        verbs:
+                          - create
+                          - get
+                          - list
+                          - patch
+                          - update
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - configmaps
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/log
+                        verbs:
+                          - get
+                          - list
+                          - watch
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/exec
+                        verbs:
+                          - get
+                          - list
+                          - create
+                      - apiGroups:
+                          - apps
+                        resources:
+                          - deployments
+                          - statefulsets
+                          - replicasets
+                          - daemonsets
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - apps.openshift.io
+                        resources:
+                          - deploymentconfigs
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - replicationcontrollers
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - argoproj.io
+                        resources:
+                          - rollouts
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - batch
+                        resources:
+                          - jobs
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - delete
+                          - deletecollection
+                      - apiGroups:
+                          - litmuschaos.io
+                        resources:
+                          - chaosengines
+                          - chaosexperiments
+                          - chaosresults
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - patch
+                          - update
+                          - delete
+                    image: docker.io/litmuschaos/go-runner:3.24.0
+                    imagePullPolicy: Always
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - ./experiments -name pod-memory-hog
+
                     env:
                       - name: TOTAL_CHAOS_DURATION
                         value: "60"
                       - name: MEMORY_CONSUMPTION
                         value: "500"
+                      - name: PODS_AFFECTED_PERC
+                        value: "50"
           - name: pod-network-loss
             path: /tmp/chaosengine-pod-network-loss.yaml
             raw:
@@ -115,13 +461,127 @@ spec:
                 metadata:
                   name: pod-network-loss
                   namespace: litmus
+                  labels:
+                    name: pod-network-loss
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: chaosexperiment
+                    app.kubernetes.io/version: 3.24.0
                 spec:
                   definition:
                     scope: Namespaced
+                    labels:
+                      name: pod-network-loss
+                      app.kubernetes.io/part-of: litmus
+                      app.kubernetes.io/component: experiment-job
+
                     permissions:
-                      - apiGroups: [""]
-                        resources: ["pods"]
-                        verbs: ["get", "list", "delete"]
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods
+                        verbs:
+                          - create
+                          - delete
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - deletecollection
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - events
+                        verbs:
+                          - create
+                          - get
+                          - list
+                          - patch
+                          - update
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - configmaps
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/log
+                        verbs:
+                          - get
+                          - list
+                          - watch
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/exec
+                        verbs:
+                          - get
+                          - list
+                          - create
+                      - apiGroups:
+                          - apps
+                        resources:
+                          - deployments
+                          - statefulsets
+                          - replicasets
+                          - daemonsets
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - apps.openshift.io
+                        resources:
+                          - deploymentconfigs
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - replicationcontrollers
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - argoproj.io
+                        resources:
+                          - rollouts
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - batch
+                        resources:
+                          - jobs
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - delete
+                          - deletecollection
+                      - apiGroups:
+                          - litmuschaos.io
+                        resources:
+                          - chaosengines
+                          - chaosexperiments
+                          - chaosresults
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - patch
+                          - update
+                          - delete
+                    image: docker.io/litmuschaos/go-runner:3.24.0
+                    imagePullPolicy: Always
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - ./experiments -name pod-network-loss
+
                     env:
                       - name: TOTAL_CHAOS_DURATION
                         value: "60"
@@ -138,13 +598,127 @@ spec:
                 metadata:
                   name: pod-io-stress
                   namespace: litmus
+                  labels:
+                    name: pod-io-stress
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: chaosexperiment
+                    app.kubernetes.io/version: 3.24.0
                 spec:
                   definition:
                     scope: Namespaced
+                    labels:
+                      name: pod-io-stress
+                      app.kubernetes.io/part-of: litmus
+                      app.kubernetes.io/component: experiment-job
+
                     permissions:
-                      - apiGroups: [""]
-                        resources: ["pods"]
-                        verbs: ["get", "list", "delete"]
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods
+                        verbs:
+                          - create
+                          - delete
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - deletecollection
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - events
+                        verbs:
+                          - create
+                          - get
+                          - list
+                          - patch
+                          - update
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - configmaps
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/log
+                        verbs:
+                          - get
+                          - list
+                          - watch
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - pods/exec
+                        verbs:
+                          - get
+                          - list
+                          - create
+                      - apiGroups:
+                          - apps
+                        resources:
+                          - deployments
+                          - statefulsets
+                          - replicasets
+                          - daemonsets
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - apps.openshift.io
+                        resources:
+                          - deploymentconfigs
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - ""
+                        resources:
+                          - replicationcontrollers
+                        verbs:
+                          - get
+                          - list
+                      - apiGroups:
+                          - argoproj.io
+                        resources:
+                          - rollouts
+                        verbs:
+                          - list
+                          - get
+                      - apiGroups:
+                          - batch
+                        resources:
+                          - jobs
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - delete
+                          - deletecollection
+                      - apiGroups:
+                          - litmuschaos.io
+                        resources:
+                          - chaosengines
+                          - chaosexperiments
+                          - chaosresults
+                        verbs:
+                          - create
+                          - list
+                          - get
+                          - patch
+                          - update
+                          - delete
+                    image: docker.io/litmuschaos/go-runner:3.24.0
+                    imagePullPolicy: Always
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - ./experiments -name pod-io-stress
+
                     env:
                       - name: TOTAL_CHAOS_DURATION
                         value: "60"
@@ -248,9 +822,9 @@ spec:
                 spec:
                   engineState: active
                   appinfo:
-                    appns: wazuh
-                    applabel: app.kubernetes.io/instance=wazuh
-                    appkind: statefulset
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appkind: "{{workflow.parameters.appKind}}"
                   chaosServiceAccount: litmus-admin
                   experiments:
                     - name: pod-cpu-hog
@@ -296,9 +870,9 @@ spec:
                 spec:
                   engineState: active
                   appinfo:
-                    appns: wazuh
-                    applabel: app.kubernetes.io/instance=wazuh
-                    appkind: statefulset
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appkind: "{{workflow.parameters.appKind}}"
                   chaosServiceAccount: litmus-admin
                   experiments:
                     - name: pod-memory-hog
@@ -342,9 +916,9 @@ spec:
                 spec:
                   engineState: active
                   appinfo:
-                    appns: wazuh
-                    applabel: app.kubernetes.io/instance=wazuh
-                    appkind: statefulset
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appkind: "{{workflow.parameters.appKind}}"
                   chaosServiceAccount: litmus-admin
                   experiments:
                     - name: pod-network-loss
@@ -428,6 +1002,7 @@ spec:
       - name: appKind
         value: statefulset
   serviceAccountName: argo-chaos
+  parallelism: 2
   podGC:
     strategy: OnWorkflowCompletion
   securityContext:
