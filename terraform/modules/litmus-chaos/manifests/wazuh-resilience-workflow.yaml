@@ -5,7 +5,7 @@ metadata:
   namespace: litmus
   labels:
     infra_id: 55eed248-6688-484d-8e6c-77f49ae59ca5
-    revision_id: 9c855833-b61b-4475-a8b0-feaf1d44dd45
+    revision_id: 0fd23d6f-b54e-4105-9b9c-6cd159faf6ab
     workflow_id: 8552d46e-3401-4c48-bbeb-a9e526653303
     workflows.argoproj.io/controller-instanceid: 55eed248-6688-484d-8e6c-77f49ae59ca5
 spec:
@@ -764,20 +764,18 @@ spec:
                 kind: ChaosEngine
 
                 metadata:
-                  namespace: "{{workflow.parameters.adminModeNamespace}}"
-                  labels:
-                    workflow_run_id: "{{ workflow.uid }}"
-                    workflow_name: test-from-yaml
-                  annotations:
-                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
                   generateName: pod-delete
+                  labels:
+                    workflow_name: test-from-yaml
+                    workflow_run_id: "{{ workflow.uid }}"
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
                 spec:
-                  engineState: active
                   appinfo:
-                    appns: "{{workflow.parameters.appNamespace}}"
-                    applabel: "{{workflow.parameters.appLabel}}"
                     appkind: "{{workflow.parameters.appKind}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appns: "{{workflow.parameters.appNamespace}}"
                   chaosServiceAccount: litmus-admin
+                  engineState: active
                   experiments:
                     - name: pod-delete
                       spec:
@@ -789,6 +787,22 @@ spec:
                               value: "10"
                             - name: FORCE
                               value: "false"
+                        probe:
+                          - cmdProbe/inputs:
+                              comparator:
+                                criteria: ==
+                                type: int
+                                value: "0"
+                              command: "sh -c 'nc -z wazuh-wazuh-helm.wazuh.svc.cluster.local 55000 && echo 0 || echo 1'"
+                              source:
+                                image: alpine:3.19
+                            mode: Continuous
+                            name: check-app-health
+                            runProperties:
+                              interval: 5s
+                              probeTimeout: 5s
+                              retry: 1
+                            type: cmdProbe
       outputs: {}
       metadata:
         labels:
@@ -812,20 +826,18 @@ spec:
                 kind: ChaosEngine
 
                 metadata:
-                  namespace: "{{workflow.parameters.adminModeNamespace}}"
-                  labels:
-                    workflow_run_id: "{{ workflow.uid }}"
-                    workflow_name: test-from-yaml
-                  annotations:
-                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
                   generateName: pod-cpu-hog
+                  labels:
+                    workflow_name: test-from-yaml
+                    workflow_run_id: "{{ workflow.uid }}"
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
                 spec:
-                  engineState: active
                   appinfo:
-                    appns: "{{workflow.parameters.appNamespace}}"
-                    applabel: "{{workflow.parameters.appLabel}}"
                     appkind: "{{workflow.parameters.appKind}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appns: "{{workflow.parameters.appNamespace}}"
                   chaosServiceAccount: litmus-admin
+                  engineState: active
                   experiments:
                     - name: pod-cpu-hog
                       spec:
@@ -837,6 +849,22 @@ spec:
                               value: "60"
                             - name: CHAOS_KILL_COMMAND
                               value: kill -9
+                        probe:
+                          - cmdProbe/inputs:
+                              comparator:
+                                criteria: ==
+                                type: int
+                                value: "0"
+                              command: "sh -c 'nc -z wazuh-wazuh-helm.wazuh.svc.cluster.local 55000 && echo 0 || echo 1'"
+                              source:
+                                image: alpine:3.19
+                            mode: Continuous
+                            name: check-app-health
+                            runProperties:
+                              interval: 5s
+                              probeTimeout: 5s
+                              retry: 1
+                            type: cmdProbe
       outputs: {}
       metadata:
         labels:
@@ -860,20 +888,18 @@ spec:
                 kind: ChaosEngine
 
                 metadata:
-                  namespace: "{{workflow.parameters.adminModeNamespace}}"
-                  labels:
-                    workflow_run_id: "{{ workflow.uid }}"
-                    workflow_name: test-from-yaml
-                  annotations:
-                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
                   generateName: pod-memory-hog
+                  labels:
+                    workflow_name: test-from-yaml
+                    workflow_run_id: "{{ workflow.uid }}"
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
                 spec:
-                  engineState: active
                   appinfo:
-                    appns: "{{workflow.parameters.appNamespace}}"
-                    applabel: "{{workflow.parameters.appLabel}}"
                     appkind: "{{workflow.parameters.appKind}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appns: "{{workflow.parameters.appNamespace}}"
                   chaosServiceAccount: litmus-admin
+                  engineState: active
                   experiments:
                     - name: pod-memory-hog
                       spec:
@@ -883,6 +909,22 @@ spec:
                               value: "500"
                             - name: TOTAL_CHAOS_DURATION
                               value: "60"
+                        probe:
+                          - cmdProbe/inputs:
+                              comparator:
+                                criteria: ==
+                                type: int
+                                value: "0"
+                              command: "sh -c 'nc -z wazuh-wazuh-helm.wazuh.svc.cluster.local 55000 && echo 0 || echo 1'"
+                              source:
+                                image: alpine:3.19
+                            mode: Continuous
+                            name: check-app-health
+                            runProperties:
+                              interval: 5s
+                              probeTimeout: 5s
+                              retry: 1
+                            type: cmdProbe
       outputs: {}
       metadata:
         labels:
@@ -906,20 +948,18 @@ spec:
                 kind: ChaosEngine
 
                 metadata:
-                  namespace: "{{workflow.parameters.adminModeNamespace}}"
-                  labels:
-                    workflow_run_id: "{{ workflow.uid }}"
-                    workflow_name: test-from-yaml
-                  annotations:
-                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
                   generateName: pod-network-loss
+                  labels:
+                    workflow_name: test-from-yaml
+                    workflow_run_id: "{{ workflow.uid }}"
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
                 spec:
-                  engineState: active
                   appinfo:
-                    appns: "{{workflow.parameters.appNamespace}}"
-                    applabel: "{{workflow.parameters.appLabel}}"
                     appkind: "{{workflow.parameters.appKind}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appns: "{{workflow.parameters.appNamespace}}"
                   chaosServiceAccount: litmus-admin
+                  engineState: active
                   experiments:
                     - name: pod-network-loss
                       spec:
@@ -931,6 +971,22 @@ spec:
                               value: "100"
                             - name: TOTAL_CHAOS_DURATION
                               value: "60"
+                        probe:
+                          - cmdProbe/inputs:
+                              comparator:
+                                criteria: ==
+                                type: int
+                                value: "0"
+                              command: "sh -c 'nc -z wazuh-wazuh-helm.wazuh.svc.cluster.local 55000 && echo 0 || echo 1'"
+                              source:
+                                image: alpine:3.19
+                            mode: Continuous
+                            name: check-app-health
+                            runProperties:
+                              interval: 5s
+                              probeTimeout: 5s
+                              retry: 1
+                            type: cmdProbe
       outputs: {}
       metadata:
         labels:
@@ -954,20 +1010,18 @@ spec:
                 kind: ChaosEngine
 
                 metadata:
-                  namespace: "{{workflow.parameters.adminModeNamespace}}"
-                  labels:
-                    workflow_run_id: "{{ workflow.uid }}"
-                    workflow_name: test-from-yaml
-                  annotations:
-                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
                   generateName: pod-io-stress
+                  labels:
+                    workflow_name: test-from-yaml
+                    workflow_run_id: "{{ workflow.uid }}"
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
                 spec:
-                  engineState: active
                   appinfo:
-                    appns: "{{workflow.parameters.appNamespace}}"
-                    applabel: "{{workflow.parameters.appLabel}}"
                     appkind: "{{workflow.parameters.appKind}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appns: "{{workflow.parameters.appNamespace}}"
                   chaosServiceAccount: litmus-admin
+                  engineState: active
                   experiments:
                     - name: pod-io-stress
                       spec:
@@ -979,6 +1033,22 @@ spec:
                               value: "60"
                             - name: NUMBER_OF_WORKERS
                               value: "4"
+                        probe:
+                          - cmdProbe/inputs:
+                              comparator:
+                                criteria: ==
+                                type: int
+                                value: "0"
+                              command: "sh -c 'nc -z wazuh-wazuh-helm.wazuh.svc.cluster.local 55000 && echo 0 || echo 1'"
+                              source:
+                                image: alpine:3.19
+                            mode: Continuous
+                            name: check-app-health
+                            runProperties:
+                              interval: 5s
+                              probeTimeout: 5s
+                              retry: 1
+                            type: cmdProbe
       outputs: {}
       metadata:
         labels:
