@@ -1,0 +1,436 @@
+kind: Workflow
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: test-from-yaml
+  namespace: litmus
+  labels:
+    infra_id: 55eed248-6688-484d-8e6c-77f49ae59ca5
+    revision_id: 016c4347-6a1a-4d18-abef-c8ce7ea3265c
+    workflow_id: 8552d46e-3401-4c48-bbeb-a9e526653303
+    workflows.argoproj.io/controller-instanceid: 55eed248-6688-484d-8e6c-77f49ae59ca5
+spec:
+  templates:
+    - name: test-from-yaml
+      inputs: {}
+      outputs: {}
+      metadata: {}
+      steps:
+        - - name: install-chaos-faults
+            template: install-chaos-faults
+            arguments: {}
+        - - name: pod-delete
+            template: pod-delete
+            arguments: {}
+        - - name: pod-cpu-hog
+            template: pod-cpu-hog
+            arguments: {}
+        - - name: pod-memory-hog
+            template: pod-memory-hog
+            arguments: {}
+        - - name: pod-network-loss
+            template: pod-network-loss
+            arguments: {}
+        - - name: pod-io-stress
+            template: pod-io-stress
+            arguments: {}
+        - - name: cleanup-chaos-resources
+            template: cleanup-chaos-resources
+            arguments: {}
+    - name: install-chaos-faults
+      inputs:
+        artifacts:
+          - name: pod-delete
+            path: /tmp/chaosengine-pod-delete.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosExperiment
+                metadata:
+                  name: pod-delete
+                  namespace: litmus
+                spec:
+                  definition:
+                    scope: Namespaced
+                    permissions:
+                      - apiGroups: [""]
+                        resources: ["pods"]
+                        verbs: ["get", "list", "delete"]
+                    env:
+                      - name: TOTAL_CHAOS_DURATION
+                        value: "30"
+                      - name: CHAOS_INTERVAL
+                        value: "10"
+                      - name: FORCE
+                        value: "false"
+          - name: pod-cpu-hog
+            path: /tmp/chaosengine-pod-cpu-hog.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosExperiment
+                metadata:
+                  name: pod-cpu-hog
+                  namespace: litmus
+                spec:
+                  definition:
+                    scope: Namespaced
+                    permissions:
+                      - apiGroups: [""]
+                        resources: ["pods"]
+                        verbs: ["get", "list", "delete"]
+                    env:
+                      - name: TOTAL_CHAOS_DURATION
+                        value: "60"
+                      - name: CPU_CORES
+                        value: "1"
+                      - name: CHAOS_KILL_COMMAND
+                        value: "kill -9"
+          - name: pod-memory-hog
+            path: /tmp/chaosengine-pod-memory-hog.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosExperiment
+                metadata:
+                  name: pod-memory-hog
+                  namespace: litmus
+                spec:
+                  definition:
+                    scope: Namespaced
+                    permissions:
+                      - apiGroups: [""]
+                        resources: ["pods"]
+                        verbs: ["get", "list", "delete"]
+                    env:
+                      - name: TOTAL_CHAOS_DURATION
+                        value: "60"
+                      - name: MEMORY_CONSUMPTION
+                        value: "500"
+          - name: pod-network-loss
+            path: /tmp/chaosengine-pod-network-loss.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosExperiment
+                metadata:
+                  name: pod-network-loss
+                  namespace: litmus
+                spec:
+                  definition:
+                    scope: Namespaced
+                    permissions:
+                      - apiGroups: [""]
+                        resources: ["pods"]
+                        verbs: ["get", "list", "delete"]
+                    env:
+                      - name: TOTAL_CHAOS_DURATION
+                        value: "60"
+                      - name: NETWORK_INTERFACE
+                        value: "eth0"
+                      - name: NETWORK_PACKET_LOSS_PERCENTAGE
+                        value: "100"
+          - name: pod-io-stress
+            path: /tmp/chaosengine-pod-io-stress.yaml
+            raw:
+              data: |
+                apiVersion: litmuschaos.io/v1alpha1
+                kind: ChaosExperiment
+                metadata:
+                  name: pod-io-stress
+                  namespace: litmus
+                spec:
+                  definition:
+                    scope: Namespaced
+                    permissions:
+                      - apiGroups: [""]
+                        resources: ["pods"]
+                        verbs: ["get", "list", "delete"]
+                    env:
+                      - name: TOTAL_CHAOS_DURATION
+                        value: "60"
+                      - name: FILESYSTEM_UTILIZATION_PERCENTAGE
+                        value: "10"
+                      - name: NUMBER_OF_WORKERS
+                        value: "4"
+      outputs: {}
+      metadata: {}
+      container:
+        name: ""
+        image: docker.io/litmuschaos/k8s:2.11.0
+        command:
+          - sh
+          - -c
+        args:
+          - kubectl apply -f /tmp/ -n {{workflow.parameters.adminModeNamespace}}
+            && sleep 30
+        resources: {}
+    - name: cleanup-chaos-resources
+      inputs: {}
+      outputs: {}
+      metadata: {}
+      container:
+        name: ""
+        image: docker.io/litmuschaos/k8s:2.11.0
+        command:
+          - sh
+          - -c
+        args:
+          - kubectl delete chaosengine -l workflow_run_id={{workflow.uid}} -n
+            {{workflow.parameters.adminModeNamespace}}
+        resources: {}
+    - name: pod-delete
+      inputs:
+        artifacts:
+          - name: pod-delete
+            path: /tmp/chaosengine-pod-delete.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{ workflow.uid }}"
+                    workflow_name: test-from-yaml
+                  annotations:
+                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
+                  generateName: pod-delete
+                spec:
+                  engineState: active
+                  appinfo:
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appkind: "{{workflow.parameters.appKind}}"
+                  chaosServiceAccount: litmus-admin
+                  experiments:
+                    - name: pod-delete
+                      spec:
+                        components:
+                          env:
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "30"
+                            - name: CHAOS_INTERVAL
+                              value: "10"
+                            - name: FORCE
+                              value: "false"
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: docker.io/litmuschaos/litmus-checker:2.11.0
+        args:
+          - -file=/tmp/chaosengine-pod-delete.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+    - name: pod-cpu-hog
+      inputs:
+        artifacts:
+          - name: pod-cpu-hog
+            path: /tmp/chaosengine-pod-cpu-hog.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{ workflow.uid }}"
+                    workflow_name: test-from-yaml
+                  annotations:
+                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
+                  generateName: pod-cpu-hog
+                spec:
+                  engineState: active
+                  appinfo:
+                    appns: wazuh
+                    applabel: app.kubernetes.io/instance=wazuh
+                    appkind: statefulset
+                  chaosServiceAccount: litmus-admin
+                  experiments:
+                    - name: pod-cpu-hog
+                      spec:
+                        components:
+                          env:
+                            - name: CPU_CORES
+                              value: "4"
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "60"
+                            - name: CHAOS_KILL_COMMAND
+                              value: kill -9
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: docker.io/litmuschaos/litmus-checker:2.11.0
+        args:
+          - -file=/tmp/chaosengine-pod-cpu-hog.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+    - name: pod-memory-hog
+      inputs:
+        artifacts:
+          - name: pod-memory-hog
+            path: /tmp/chaosengine-pod-memory-hog.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{ workflow.uid }}"
+                    workflow_name: test-from-yaml
+                  annotations:
+                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
+                  generateName: pod-memory-hog
+                spec:
+                  engineState: active
+                  appinfo:
+                    appns: wazuh
+                    applabel: app.kubernetes.io/instance=wazuh
+                    appkind: statefulset
+                  chaosServiceAccount: litmus-admin
+                  experiments:
+                    - name: pod-memory-hog
+                      spec:
+                        components:
+                          env:
+                            - name: MEMORY_CONSUMPTION
+                              value: "500"
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "60"
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: docker.io/litmuschaos/litmus-checker:2.11.0
+        args:
+          - -file=/tmp/chaosengine-pod-memory-hog.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+    - name: pod-network-loss
+      inputs:
+        artifacts:
+          - name: pod-network-loss
+            path: /tmp/chaosengine-pod-network-loss.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{ workflow.uid }}"
+                    workflow_name: test-from-yaml
+                  annotations:
+                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
+                  generateName: pod-network-loss
+                spec:
+                  engineState: active
+                  appinfo:
+                    appns: wazuh
+                    applabel: app.kubernetes.io/instance=wazuh
+                    appkind: statefulset
+                  chaosServiceAccount: litmus-admin
+                  experiments:
+                    - name: pod-network-loss
+                      spec:
+                        components:
+                          env:
+                            - name: NETWORK_INTERFACE
+                              value: eth0
+                            - name: NETWORK_PACKET_LOSS_PERCENTAGE
+                              value: "100"
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "60"
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: docker.io/litmuschaos/litmus-checker:2.11.0
+        args:
+          - -file=/tmp/chaosengine-pod-network-loss.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+    - name: pod-io-stress
+      inputs:
+        artifacts:
+          - name: pod-io-stress
+            path: /tmp/chaosengine-pod-io-stress.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{ workflow.uid }}"
+                    workflow_name: test-from-yaml
+                  annotations:
+                    probeRef: '[{"name":"check-app-health","mode":"Continuous"}]'
+                  generateName: pod-io-stress
+                spec:
+                  engineState: active
+                  appinfo:
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: "{{workflow.parameters.appLabel}}"
+                    appkind: "{{workflow.parameters.appKind}}"
+                  chaosServiceAccount: litmus-admin
+                  experiments:
+                    - name: pod-io-stress
+                      spec:
+                        components:
+                          env:
+                            - name: FILESYSTEM_UTILIZATION_PERCENTAGE
+                              value: "10"
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "60"
+                            - name: NUMBER_OF_WORKERS
+                              value: "4"
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: docker.io/litmuschaos/litmus-checker:2.11.0
+        args:
+          - -file=/tmp/chaosengine-pod-io-stress.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+  entrypoint: test-from-yaml
+  arguments:
+    parameters:
+      - name: adminModeNamespace
+        value: litmus
+      - name: appNamespace
+        value: wazuh
+      - name: appLabel
+        value: app.kubernetes.io/instance=wazuh
+      - name: appKind
+        value: statefulset
+  serviceAccountName: argo-chaos
+  podGC:
+    strategy: OnWorkflowCompletion
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+status: {}
