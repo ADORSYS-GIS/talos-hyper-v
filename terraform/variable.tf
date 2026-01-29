@@ -133,3 +133,26 @@ variable "kubernetes_version" {
   type        = string
   description = "The version of Kubernetes to use."
 }
+
+variable "litmus_namespace" {
+  description = "Kubernetes namespace where LitmusChaos will be installed"
+  type        = string
+  default     = "litmus"
+}
+
+variable "runtime_environment" {
+  description = "Runtime environment"
+  type        = string
+  default     = "containerd"
+}
+
+variable "runtime_socket_path" {
+  description = "Runtime environment socker path"
+  type        = string
+  default     = "/k3s/containerd/containerd.sock"
+}
+
+variable "litmus_environment" {
+  description = "Environment ID for LitmusChaos"
+  type        = string
+}

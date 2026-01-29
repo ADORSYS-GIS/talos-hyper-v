@@ -52,3 +52,12 @@ module "wazuh" {
 
   depends_on = [module.longhorn]
 }
+
+module "litmus_chaos" {
+  source              = "./modules/litmus-chaos"
+  namespace           = var.litmus_namespace
+  runtime_environment = var.runtime_environment
+  runtime_socket_path = var.runtime_socket_path
+
+  depends_on = [module.longhorn]
+}
